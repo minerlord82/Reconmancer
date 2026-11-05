@@ -1,0 +1,12 @@
+# Example ProjectDiscovery binary paths.
+# These are common for a root-owned PDTM installation on a VPS.
+# Copy this file to config/tools.yaml and edit every path to match
+# the binaries installed on your own machine.
+
+tools:
+  httpx:
+    path: /root/.pdtm/go/bin/httpx
+  katana:
+    path: /root/.pdtm/go/bin/katana
+  nuclei:
+    path: /root/.pdtm/go/bin/nuclei

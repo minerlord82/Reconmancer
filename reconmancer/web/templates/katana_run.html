@@ -1,0 +1,978 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+{{ run.id }} · Katana · Reconmancer
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="page-header">
+
+    <div>
+
+        <div class="eyebrow">
+            KATANA RUN
+        </div>
+
+        <h1>
+            {{ run.id }}
+        </h1>
+
+        <p class="muted">
+            {{ run.profile }}
+            ·
+            {{ run.started_at }}
+        </p>
+
+    </div>
+
+
+    <span class="run-status status-{{ run.status }}">
+        {{ run.status }}
+    </span>
+
+</div>
+
+
+<div class="stats-grid">
+
+    <div class="stat-card">
+        <span class="stat-label">Unique URLs</span>
+        <strong class="stat-value">{{ stats.unique_urls }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span class="stat-label">Endpoint Groups</span>
+        <strong class="stat-value">{{ stats.endpoint_groups }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span class="stat-label">Hosts</span>
+        <strong class="stat-value">{{ stats.hosts }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span class="stat-label">JavaScript</span>
+        <strong class="stat-value">{{ stats.javascript }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span class="stat-label">Runtime</span>
+        <strong class="stat-value">{{ stats.runtime }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span class="stat-label">XHR</span>
+        <strong class="stat-value">{{ stats.xhr }}</strong>
+    </div>
+
+</div>
+
+
+<section class="panel handoff-panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Send to HTTPX
+            </h2>
+
+            <p class="muted">
+                Probe every unique HTTP(S) URL
+                discovered by Katana.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <form
+        method="post"
+        action="/p/{{ project.config.project.slug }}/katana/run/{{ run.id }}/send/httpx/"
+    >
+
+        <div class="handoff-grid">
+
+            <div>
+
+                <label class="form-label">
+                    HTTPX rate limit
+                </label>
+
+                <input
+                    class="form-input"
+                    type="number"
+                    name="rate_limit"
+                    value="10"
+                    min="1"
+                    max="1000"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Redirect depth
+                </label>
+
+                <input
+                    class="form-input"
+                    type="number"
+                    name="redirect_depth"
+                    value="10"
+                    min="0"
+                    max="50"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="handoff-options">
+
+            <label>
+
+                <input
+                    type="checkbox"
+                    name="screenshots"
+                    value="1"
+                >
+
+                Capture screenshots
+
+            </label>
+
+        </div>
+
+
+        <div class="handoff-note">
+
+            Non-GET Katana discoveries are passed as
+            URLs for HTTPX enrichment. Their original
+            method/runtime/XHR metadata remains in
+            handoff provenance.
+
+        </div>
+
+
+        <button
+            class="button scan-button"
+            type="submit"
+        >
+            Send to HTTPX
+        </button>
+
+    </form>
+
+</section>
+
+
+<section class="panel handoff-panel nuclei-handoff">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Send to Nuclei
+            </h2>
+
+            <p class="muted">
+                Run Nuclei against Katana's unique
+                discovered HTTP(S) URLs.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <form
+        method="post"
+        action="/p/{{ project.config.project.slug }}/katana/run/{{ run.id }}/send/nuclei/"
+    >
+
+
+        <div class="handoff-grid">
+
+            <div>
+
+                <label class="form-label">
+                    Template source
+                </label>
+
+                <select
+                    class="form-input"
+                    name="template_source"
+                >
+                    <option value="default">
+                        Default Nuclei
+                    </option>
+                    <option value="projectdiscovery">
+                        nuclei-templates (ProjectDiscovery)
+                    </option>
+                </select>
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Rate limit
+                </label>
+
+                <input
+                    class="form-input"
+                    type="number"
+                    name="rate_limit"
+                    value="10"
+                    min="1"
+                    max="500"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Concurrency
+                </label>
+
+                <input
+                    class="form-input"
+                    type="number"
+                    name="concurrency"
+                    value="5"
+                    min="1"
+                    max="50"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Bulk size
+                </label>
+
+                <input
+                    class="form-input"
+                    type="number"
+                    name="bulk_size"
+                    value="5"
+                    min="1"
+                    max="50"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="severity-options">
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="severity"
+                    value="critical"
+                    checked
+                >
+                Critical
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="severity"
+                    value="high"
+                    checked
+                >
+                High
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="severity"
+                    value="medium"
+                    checked
+                >
+                Medium
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="severity"
+                    value="low"
+                    checked
+                >
+                Low
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="severity"
+                    value="info"
+                    checked
+                >
+                Info
+            </label>
+
+        </div>
+
+
+        <div class="handoff-grid handoff-text-grid">
+
+            <div>
+
+                <label class="form-label">
+                    Template tags
+                </label>
+
+                <input
+                    class="form-input"
+                    type="text"
+                    name="tags"
+                    placeholder="Optional"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Excluded tags
+                </label>
+
+                <input
+                    class="form-input"
+                    type="text"
+                    name="exclude_tags"
+                    value="dos,fuzz,bruteforce"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="handoff-options">
+
+            <label>
+
+                <input
+                    type="checkbox"
+                    name="no_interactsh"
+                    value="1"
+                    checked
+                >
+
+                Disable Interactsh
+
+            </label>
+
+
+            <label>
+
+                <input
+                    type="checkbox"
+                    name="allow_headless"
+                    value="1"
+                >
+
+                Allow headless templates
+
+            </label>
+
+        </div>
+
+
+        <div class="handoff-note">
+
+            Exact Katana source record IDs and
+            discovery provenance are preserved in
+            handoff_items even after URLs are
+            deduplicated for Nuclei.
+
+        </div>
+
+
+        <button
+            class="button scan-button"
+            type="submit"
+        >
+            Send to Nuclei
+        </button>
+
+    </form>
+
+</section>
+
+
+{% if handoffs %}
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+            <h2>
+                Handoff History
+            </h2>
+        </div>
+
+    </div>
+
+
+    <div class="table-wrap">
+
+        <table class="data-table">
+
+            <thead>
+
+            <tr>
+                <th>Handoff</th>
+                <th>Destination</th>
+                <th>Profile</th>
+                <th>Targets</th>
+                <th>Status</th>
+                <th>Run</th>
+            </tr>
+
+            </thead>
+
+
+            <tbody>
+
+            {% for handoff in handoffs %}
+
+            <tr>
+
+                <td class="mono">
+                    {{ handoff.id }}
+                </td>
+
+                <td>
+                    {{ handoff.destination_engine }}
+                </td>
+
+                <td>
+                    {{ handoff.destination_profile or "—" }}
+                </td>
+
+                <td>
+                    {{ handoff.target_count }}
+                </td>
+
+                <td>
+
+                    <span
+                        class="run-status status-{{ handoff.effective_status }}"
+                    >
+                        {{ handoff.effective_status }}
+                    </span>
+
+                </td>
+
+                <td>
+
+                    {% if handoff.destination_run_id %}
+
+                        {% if handoff.destination_engine == "httpx" %}
+
+                        <a
+                            class="table-link"
+                            href="/p/{{ project.config.project.slug }}/httpx/run/{{ handoff.destination_run_id }}/"
+                        >
+                            {{ handoff.destination_run_id }}
+                        </a>
+
+                        {% elif handoff.destination_engine == "nuclei" %}
+
+                        <a
+                            class="table-link"
+                            href="/p/{{ project.config.project.slug }}/nuclei/run/{{ handoff.destination_run_id }}/"
+                        >
+                            {{ handoff.destination_run_id }}
+                        </a>
+
+                        {% else %}
+
+                            {{ handoff.destination_run_id }}
+
+                        {% endif %}
+
+                    {% else %}
+
+                    <span class="muted">
+                        —
+                    </span>
+
+                    {% endif %}
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+{% endif %}
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Grouped Endpoints
+            </h2>
+
+            <p class="muted">
+                Grouped by host, path and
+                query-parameter names.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if groups %}
+
+    <div class="table-wrap">
+
+        <table class="data-table">
+
+            <thead>
+
+            <tr>
+                <th>Host</th>
+                <th>Path</th>
+                <th>Query Keys</th>
+                <th>Methods</th>
+                <th>Discoveries</th>
+                <th>Variants</th>
+                <th>JS</th>
+                <th>Runtime</th>
+                <th>XHR</th>
+            </tr>
+
+            </thead>
+
+
+            <tbody>
+
+            {% for group in groups %}
+
+            <tr>
+
+                <td class="mono">
+                    {{ group.host or "—" }}
+                </td>
+
+
+                <td class="url-cell">
+
+                    {% if group.example_url %}
+
+                    <a
+                        href="{{ group.example_url }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        {{ group.path or "/" }}
+                    </a>
+
+                    {% else %}
+
+                        {{ group.path or "/" }}
+
+                    {% endif %}
+
+                </td>
+
+
+                <td class="mono">
+
+                    {% if group.query_signature %}
+
+                        {{ group.query_signature }}
+
+                    {% else %}
+
+                        —
+
+                    {% endif %}
+
+                </td>
+
+
+                <td class="mono">
+                    {{ group.methods or "—" }}
+                </td>
+
+                <td>
+                    {{ group.discoveries }}
+                </td>
+
+                <td>
+                    {{ group.variants }}
+                </td>
+
+                <td>
+                    {{ group.javascript or 0 }}
+                </td>
+
+                <td>
+                    {{ group.runtime or 0 }}
+                </td>
+
+                <td>
+                    {{ group.xhr or 0 }}
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {% endif %}
+
+</section>
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Original Discoveries
+            </h2>
+
+            <p class="muted">
+                {{ total }} normalized Katana records.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="table-wrap">
+
+        <table class="data-table">
+
+            <thead>
+
+            <tr>
+                <th>Status</th>
+                <th>Method</th>
+                <th>Kind</th>
+                <th>URL</th>
+                <th>Parameters</th>
+                <th>Source</th>
+            </tr>
+
+            </thead>
+
+
+            <tbody>
+
+            {% for item in observations %}
+
+            <tr data-recon-source-engine="katana" data-recon-run-id="{{ run.id }}" data-recon-record-id="{{ item.id }}">
+
+                <td>
+
+                    {% if item.status_code %}
+
+                    <span
+                        class="http-status status-code-{{ item.status_code // 100 }}"
+                    >
+                        {{ item.status_code }}
+                    </span>
+
+                    {% else %}
+
+                        —
+
+                    {% endif %}
+
+                </td>
+
+
+                <td class="mono">
+                    {{ item.method or "—" }}
+                </td>
+
+
+                <td>
+
+                    {% if item.is_xhr %}
+
+                    <span class="katana-badge xhr-badge">
+                        XHR
+                    </span>
+
+                    {% elif item.is_runtime %}
+
+                    <span class="katana-badge runtime-badge">
+                        RUNTIME
+                    </span>
+
+                    {% elif item.source_kind == "js-static" %}
+
+                    <span class="katana-badge">
+                        JS STATIC
+                    </span>
+
+                    {% elif item.is_javascript %}
+
+                    <span class="katana-badge">
+                        JS
+                    </span>
+
+                    {% elif item.source_kind == "form" %}
+
+                    <span class="katana-badge form-badge">
+                        FORM
+                    </span>
+
+                    {% else %}
+
+                        URL
+
+                    {% endif %}
+
+                </td>
+
+
+                <td class="url-cell">
+
+                    <a
+                        href="{{ item.normalized_url }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        {{ item.normalized_url }}
+                    </a>
+
+                </td>
+
+
+                <td class="mono">
+                    {{ item.query_keys_json or "—" }}
+                </td>
+
+
+                <td class="mono source-cell">
+                    {{ item.source_url or "—" }}
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    {% if pages > 1 %}
+
+    <div class="pagination">
+
+        {% if page > 1 %}
+
+        <a
+            class="button secondary"
+            href="?page={{ page - 1 }}"
+        >
+            Previous
+        </a>
+
+        {% endif %}
+
+        <span class="muted">
+            Page {{ page }} / {{ pages }}
+        </span>
+
+        {% if page < pages %}
+
+        <a
+            class="button secondary"
+            href="?page={{ page + 1 }}"
+        >
+            Next
+        </a>
+
+        {% endif %}
+
+    </div>
+
+    {% endif %}
+
+</section>
+
+
+<style>
+
+.handoff-panel {
+    border-color:
+        rgba(152, 119, 255, 0.32);
+}
+
+
+.nuclei-handoff {
+    border-color:
+        rgba(255, 170, 70, 0.28);
+}
+
+
+.handoff-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(170px, 1fr)
+        );
+
+    gap: 14px;
+}
+
+
+.handoff-text-grid {
+    margin-top: 18px;
+}
+
+
+.handoff-options,
+.severity-options {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 16px;
+
+    margin-top: 18px;
+}
+
+
+.handoff-options label,
+.severity-options label {
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    font-size: 12px;
+}
+
+
+.handoff-note {
+    margin-top: 18px;
+
+    padding: 12px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 8px;
+
+    color: var(--muted);
+
+    font-size: 11px;
+
+    line-height: 1.6;
+}
+
+
+.katana-badge {
+    display: inline-block;
+
+    padding:
+        4px 7px;
+
+    border-radius: 6px;
+
+    background:
+        rgba(152, 119, 255, 0.13);
+
+    color:
+        #c5b6ff;
+
+    font-size: 10px;
+
+    font-weight: 700;
+}
+
+
+.xhr-badge {
+    color:
+        #8cd4ff;
+}
+
+
+.runtime-badge {
+    color:
+        #ffd084;
+}
+
+
+.form-badge {
+    color:
+        #79dfaf;
+}
+
+
+.source-cell {
+    max-width: 320px;
+
+    overflow-wrap: anywhere;
+
+    color: var(--muted);
+
+    font-size: 11px;
+}
+
+</style>
+
+
+{% endblock %}

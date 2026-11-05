@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+config/tools.yaml
+secrets/
+
+# Reconmancer project/runtime data
+projects/*
+!projects/.gitkeep
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
+# Generated/runtime files
+logs/
+temp/
+*.log
+*.pid
+
+# Managed external template repositories
+templates/nuclei-templates-projectdiscovery/
+!templates/.gitkeep
+
+# Archives/backups
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+reconmancer-backups/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

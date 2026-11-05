@@ -1,0 +1,144 @@
+.auth-execution-box {
+    margin:
+        0 0 22px;
+
+    padding:
+        14px;
+
+    border:
+        1px solid
+        rgba(
+            152,
+            119,
+            255,
+            0.28
+        );
+
+    border-radius:
+        9px;
+
+    background:
+        rgba(
+            152,
+            119,
+            255,
+            0.035
+        );
+}
+
+
+.auth-execution-title {
+    margin-bottom:
+        10px;
+
+    font-size:
+        12px;
+
+    font-weight:
+        700;
+}
+
+
+.auth-mode-row {
+    display:
+        flex;
+
+    flex-wrap:
+        wrap;
+
+    gap:
+        16px;
+}
+
+
+.auth-mode-row label {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        6px;
+
+    cursor:
+        pointer;
+
+    font-size:
+        12px;
+}
+
+
+.auth-profile-area {
+    margin-top:
+        14px;
+}
+
+
+.auth-host-list {
+    display:
+        flex;
+
+    flex-wrap:
+        wrap;
+
+    gap:
+        6px;
+
+    margin-top:
+        9px;
+}
+
+
+.auth-host-chip {
+    padding:
+        4px 6px;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:
+        5px;
+
+    color:
+        var(--muted);
+
+    font-family:
+        "SFMono-Regular",
+        Consolas,
+        monospace;
+
+    font-size:
+        10px;
+}
+
+
+.auth-execution-note {
+    margin-top:
+        10px;
+
+    color:
+        var(--muted);
+
+    font-size:
+        11px;
+
+    line-height:
+        1.5;
+}
+
+
+.auth-execution-note.warning {
+    color:
+        #ffd180;
+}
+
+
+.auth-profile-empty {
+    color:
+        #ff9aa8;
+
+    font-size:
+        11px;
+}

@@ -1,0 +1,379 @@
+{% extends "base.html" %}
+
+{% block title %}
+Analysis · {{ project.config.project.name }}
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <div class="eyebrow">
+      URL INTELLIGENCE
+    </div>
+
+    <h1>
+      Endpoint & Parameter Analysis
+    </h1>
+
+    <p class="muted">
+      Clusters variable path segments and inventories query parameters
+      without automatically testing them.
+    </p>
+  </div>
+</div>
+
+
+<div class="stats-grid">
+
+  <div class="stat-card">
+    <span class="stat-label">
+      New URLs analyzed
+    </span>
+
+    <strong class="stat-value">
+      {{ refresh.processed_urls }}
+    </strong>
+  </div>
+
+
+  <div class="stat-card">
+    <span class="stat-label">
+      Endpoint clusters
+    </span>
+
+    <strong class="stat-value">
+      {{ clusters["total"] }}
+    </strong>
+  </div>
+
+
+  <div class="stat-card">
+    <span class="stat-label">
+      Parameter patterns
+    </span>
+
+    <strong class="stat-value">
+      {{ parameters["total"] }}
+    </strong>
+  </div>
+
+</div>
+
+
+<section class="panel">
+
+  <div class="panel-header">
+    <div>
+
+      <h2>
+        Endpoint Clustering
+      </h2>
+
+      <p class="muted">
+        Examples such as /users/123 and /users/456 become /users/{int}.
+      </p>
+
+    </div>
+  </div>
+
+
+  <form method="get" class="workflow-filter-grid">
+
+    <input
+      class="form-input"
+      name="cluster_q"
+      value="{{ filters.cluster_q }}"
+      placeholder="Host or path pattern"
+    >
+
+    <input
+      class="form-input"
+      type="number"
+      min="1"
+      name="min_variants"
+      value="{{ filters.min_variants }}"
+      title="Minimum distinct URLs"
+    >
+
+    <input
+      type="hidden"
+      name="param_q"
+      value="{{ filters.param_q }}"
+    >
+
+    <input
+      type="hidden"
+      name="param_kind"
+      value="{{ filters.param_kind }}"
+    >
+
+    <button
+      class="button secondary"
+      type="submit"
+    >
+      Filter clusters
+    </button>
+
+  </form>
+
+
+  <div class="table-wrap">
+
+    <table class="data-table">
+
+      <thead>
+        <tr>
+          <th>Host</th>
+          <th>Pattern</th>
+          <th>Variants</th>
+          <th>Example</th>
+        </tr>
+      </thead>
+
+
+      <tbody>
+
+      {% for item in clusters["items"] %}
+
+        <tr>
+
+          <td class="mono">
+            {{ item.host }}
+          </td>
+
+          <td class="mono">
+            {{ item.path_pattern }}
+          </td>
+
+          <td>
+            {{ item.url_count }}
+          </td>
+
+          <td class="workflow-url">
+            {{ item.sample_url }}
+          </td>
+
+        </tr>
+
+      {% else %}
+
+        <tr>
+          <td colspan="4" class="muted">
+            No multi-URL endpoint clusters yet.
+          </td>
+        </tr>
+
+      {% endfor %}
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</section>
+
+
+<section class="panel">
+
+  <div class="panel-header">
+
+    <div>
+
+      <h2>
+        Query-Parameter Analysis
+      </h2>
+
+      <p class="muted">
+        Highlights ID-like, URL/redirect-like and file/path-like
+        parameters and observed value shapes.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <form method="get" class="workflow-filter-grid">
+
+    <input
+      class="form-input"
+      name="param_q"
+      value="{{ filters.param_q }}"
+      placeholder="Parameter, host or endpoint"
+    >
+
+
+    <select
+      class="form-input"
+      name="param_kind"
+    >
+
+      <option value="all">
+        All parameters
+      </option>
+
+      <option
+        value="id-like"
+        {% if filters.param_kind == 'id-like' %}
+        selected
+        {% endif %}
+      >
+        ID-like
+      </option>
+
+      <option
+        value="url-like"
+        {% if filters.param_kind == 'url-like' %}
+        selected
+        {% endif %}
+      >
+        URL / redirect-like
+      </option>
+
+      <option
+        value="file-like"
+        {% if filters.param_kind == 'file-like' %}
+        selected
+        {% endif %}
+      >
+        File / path-like
+      </option>
+
+    </select>
+
+
+    <input
+      type="hidden"
+      name="cluster_q"
+      value="{{ filters.cluster_q }}"
+    >
+
+    <input
+      type="hidden"
+      name="min_variants"
+      value="{{ filters.min_variants }}"
+    >
+
+
+    <button
+      class="button secondary"
+      type="submit"
+    >
+      Filter parameters
+    </button>
+
+  </form>
+
+
+  <div class="table-wrap">
+
+    <table class="data-table">
+
+      <thead>
+
+        <tr>
+          <th>Host</th>
+          <th>Endpoint</th>
+          <th>Parameter</th>
+          <th>Flags</th>
+          <th>Seen</th>
+          <th>Shapes</th>
+          <th>Examples</th>
+        </tr>
+
+      </thead>
+
+
+      <tbody>
+
+      {% for item in parameters["items"] %}
+
+        <tr>
+
+          <td class="mono">
+            {{ item.host }}
+          </td>
+
+
+          <td class="mono">
+            {{ item.path_pattern }}
+          </td>
+
+
+          <td class="mono">
+            {{ item.parameter_name }}
+          </td>
+
+
+          <td>
+
+            {% if item.id_like %}
+            <span class="workflow-chip">
+              ID
+            </span>
+            {% endif %}
+
+            {% if item.url_like %}
+            <span class="workflow-chip">
+              URL
+            </span>
+            {% endif %}
+
+            {% if item.file_like %}
+            <span class="workflow-chip">
+              FILE
+            </span>
+            {% endif %}
+
+          </td>
+
+
+          <td>
+            {{ item.total_urls }}
+          </td>
+
+
+          <td class="mono">
+
+            num {{ item.numeric_count }}
+            ·
+            uuid {{ item.uuid_count }}
+            ·
+            token {{ item.token_count }}
+            ·
+            url {{ item.url_value_count }}
+            ·
+            path {{ item.path_value_count }}
+
+          </td>
+
+
+          <td class="workflow-examples">
+            {{ item.examples|join(', ') }}
+          </td>
+
+        </tr>
+
+      {% else %}
+
+        <tr>
+
+          <td colspan="7" class="muted">
+            No matching query parameters.
+          </td>
+
+        </tr>
+
+      {% endfor %}
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</section>
+
+{% endblock %}

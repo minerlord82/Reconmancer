@@ -1,0 +1,1179 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+{{ run.id }} · HTTPX · Reconmancer
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="page-header">
+
+    <div>
+
+        <div class="eyebrow">
+            HTTPX RUN
+        </div>
+
+        <h1>
+            {{ run.id }}
+        </h1>
+
+        <p class="muted">
+            {{ run.started_at }}
+        </p>
+
+    </div>
+
+
+    <span class="run-status status-{{ run.status }}">
+        {{ run.status }}
+    </span>
+
+</div>
+
+
+<div class="stats-grid">
+
+    <div class="stat-card">
+        <span class="stat-label">Observations</span>
+        <strong class="stat-value">{{ stats.total }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span class="stat-label">2xx</span>
+        <strong class="stat-value">{{ stats.status_2xx }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span class="stat-label">3xx</span>
+        <strong class="stat-value">{{ stats.status_3xx }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span class="stat-label">4xx</span>
+        <strong class="stat-value">{{ stats.status_4xx }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span class="stat-label">Redirects</span>
+        <strong class="stat-value">{{ stats.redirects }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span class="stat-label">Screenshots</span>
+        <strong class="stat-value">{{ stats.screenshots }}</strong>
+    </div>
+
+</div>
+
+
+<section class="panel handoff-panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Send to Katana
+            </h2>
+
+            <p class="muted">
+                Crawl all unique HTTP(S) URLs observed
+                during this HTTPX run.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <form
+        method="post"
+        action="/p/{{ project.config.project.slug }}/httpx/run/{{ run.id }}/send/katana/"
+    >
+
+        <div class="handoff-grid">
+
+            <div>
+
+                <label class="form-label">
+                    Profile
+                </label>
+
+                <select
+                    class="form-input"
+                    name="profile"
+                >
+
+                    <option
+                        value="standard"
+                        selected
+                    >
+                        Standard
+                    </option>
+
+                    <option value="headless">
+                        Headless
+                    </option>
+
+                    <option value="deep">
+                        Deep
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Depth
+                </label>
+
+                <input
+                    class="form-input"
+                    type="number"
+                    name="depth"
+                    value="3"
+                    min="1"
+                    max="10"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Rate
+                </label>
+
+                <input
+                    class="form-input"
+                    type="number"
+                    name="rate_limit"
+                    value="20"
+                    min="1"
+                    max="500"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Concurrency
+                </label>
+
+                <input
+                    class="form-input"
+                    type="number"
+                    name="concurrency"
+                    value="5"
+                    min="1"
+                    max="50"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Parallelism
+                </label>
+
+                <input
+                    class="form-input"
+                    type="number"
+                    name="parallelism"
+                    value="2"
+                    min="1"
+                    max="20"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Page load
+                </label>
+
+                <select
+                    class="form-input"
+                    name="page_load_strategy"
+                >
+
+                    <option value="heuristic">
+                        heuristic
+                    </option>
+
+                    <option value="domcontentloaded">
+                        domcontentloaded
+                    </option>
+
+                    <option value="networkidle">
+                        networkidle
+                    </option>
+
+                    <option value="load">
+                        load
+                    </option>
+
+                    <option value="none">
+                        none
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <div class="handoff-options">
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="js_crawl"
+                    value="1"
+                    checked
+                >
+                JavaScript crawl
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="known_files"
+                    value="1"
+                    checked
+                >
+                Known files
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="form_extraction"
+                    value="1"
+                    checked
+                >
+                Forms
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="tech_detect"
+                    value="1"
+                    checked
+                >
+                Tech detection
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="no_scope"
+                    value="1"
+                >
+                Disable Katana scope
+            </label>
+
+        </div>
+
+
+        <button
+            class="button scan-button"
+            type="submit"
+        >
+            Send to Katana
+        </button>
+
+    </form>
+
+</section>
+
+
+<section class="panel handoff-panel nuclei-handoff">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Send to Nuclei
+            </h2>
+
+            <p class="muted">
+                Run Nuclei against every unique
+                HTTP(S) URL found by this HTTPX run.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <form
+        method="post"
+        action="/p/{{ project.config.project.slug }}/httpx/run/{{ run.id }}/send/nuclei/"
+    >
+
+
+        <div class="handoff-grid">
+
+            <div>
+
+                <label class="form-label">
+                    Template source
+                </label>
+
+                <select
+                    class="form-input"
+                    name="template_source"
+                >
+                    <option value="default">
+                        Default Nuclei
+                    </option>
+                    <option value="projectdiscovery">
+                        nuclei-templates (ProjectDiscovery)
+                    </option>
+                </select>
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Rate limit
+                </label>
+
+                <input
+                    class="form-input"
+                    type="number"
+                    name="rate_limit"
+                    value="10"
+                    min="1"
+                    max="500"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Concurrency
+                </label>
+
+                <input
+                    class="form-input"
+                    type="number"
+                    name="concurrency"
+                    value="5"
+                    min="1"
+                    max="50"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Bulk size
+                </label>
+
+                <input
+                    class="form-input"
+                    type="number"
+                    name="bulk_size"
+                    value="5"
+                    min="1"
+                    max="50"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="severity-options">
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="severity"
+                    value="critical"
+                    checked
+                >
+                Critical
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="severity"
+                    value="high"
+                    checked
+                >
+                High
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="severity"
+                    value="medium"
+                    checked
+                >
+                Medium
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="severity"
+                    value="low"
+                    checked
+                >
+                Low
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="severity"
+                    value="info"
+                    checked
+                >
+                Info
+            </label>
+
+        </div>
+
+
+        <div class="handoff-grid handoff-text-grid">
+
+            <div>
+
+                <label class="form-label">
+                    Template tags
+                </label>
+
+                <input
+                    class="form-input"
+                    type="text"
+                    name="tags"
+                    placeholder="Optional"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Excluded tags
+                </label>
+
+                <input
+                    class="form-input"
+                    type="text"
+                    name="exclude_tags"
+                    value="dos,fuzz,bruteforce"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="handoff-options">
+
+            <label>
+
+                <input
+                    type="checkbox"
+                    name="no_interactsh"
+                    value="1"
+                    checked
+                >
+
+                Disable Interactsh
+
+            </label>
+
+
+            <label>
+
+                <input
+                    type="checkbox"
+                    name="allow_headless"
+                    value="1"
+                >
+
+                Allow headless templates
+
+            </label>
+
+        </div>
+
+
+        <div class="handoff-note">
+
+            The handoff is persisted before the
+            Nuclei worker launches. Every target
+            retains its original HTTPX observation
+            ID and metadata as provenance.
+
+        </div>
+
+
+        <button
+            class="button scan-button"
+            type="submit"
+        >
+            Send to Nuclei
+        </button>
+
+    </form>
+
+</section>
+
+
+{% if handoffs %}
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Handoff History
+            </h2>
+
+            <p class="muted">
+                Jobs created from {{ run.id }}.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="table-wrap">
+
+        <table class="data-table">
+
+            <thead>
+
+            <tr>
+                <th>Handoff</th>
+                <th>Destination</th>
+                <th>Profile</th>
+                <th>Targets</th>
+                <th>Status</th>
+                <th>Run</th>
+            </tr>
+
+            </thead>
+
+
+            <tbody>
+
+            {% for handoff in handoffs %}
+
+            <tr>
+
+                <td class="mono">
+                    {{ handoff.id }}
+                </td>
+
+                <td>
+                    {{ handoff.destination_engine }}
+                </td>
+
+                <td>
+                    {{ handoff.destination_profile or "—" }}
+                </td>
+
+                <td>
+                    {{ handoff.target_count }}
+                </td>
+
+                <td>
+
+                    <span
+                        class="run-status status-{{ handoff.effective_status }}"
+                    >
+                        {{ handoff.effective_status }}
+                    </span>
+
+                </td>
+
+                <td>
+
+                    {% if handoff.destination_run_id %}
+
+                        {% if handoff.destination_engine == "katana" %}
+
+                        <a
+                            class="table-link"
+                            href="/p/{{ project.config.project.slug }}/katana/run/{{ handoff.destination_run_id }}/"
+                        >
+                            {{ handoff.destination_run_id }}
+                        </a>
+
+                        {% elif handoff.destination_engine == "nuclei" %}
+
+                        <a
+                            class="table-link"
+                            href="/p/{{ project.config.project.slug }}/nuclei/run/{{ handoff.destination_run_id }}/"
+                        >
+                            {{ handoff.destination_run_id }}
+                        </a>
+
+                        {% else %}
+
+                            {{ handoff.destination_run_id }}
+
+                        {% endif %}
+
+                    {% else %}
+
+                    <span class="muted">
+                        —
+                    </span>
+
+                    {% endif %}
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+{% endif %}
+
+
+{% if stats.screenshots > 0 %}
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Visual Recon
+            </h2>
+
+        </div>
+
+    </div>
+
+
+    <div class="visual-grid">
+
+        {% for item in observations %}
+
+            {% if item.screenshot_hash %}
+
+            <a
+                class="visual-card"
+                href="{{ url_for(
+                    'httpx_screenshot',
+                    slug=project.config.project.slug,
+                    hash_value=item.screenshot_hash
+                ) }}"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+
+                <img
+                    loading="lazy"
+                    src="{{ url_for(
+                        'httpx_screenshot_thumb',
+                        slug=project.config.project.slug,
+                        hash_value=item.screenshot_hash
+                    ) }}"
+                    alt="{{ item.url }}"
+                >
+
+                <div class="visual-info">
+
+                    <div class="visual-title">
+                        {{ item.title or item.host or "Untitled" }}
+                    </div>
+
+                    <div class="visual-url mono">
+                        {{ item.url }}
+                    </div>
+
+                </div>
+
+            </a>
+
+            {% endif %}
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+{% endif %}
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                HTTP Observations
+            </h2>
+
+            <p class="muted">
+                {{ total }} normalized HTTPX results
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="table-wrap">
+
+        <table class="data-table">
+
+            <thead>
+
+            <tr>
+                <th>Screenshot</th>
+                <th>Status</th>
+                <th>URL</th>
+                <th>Title</th>
+                <th>Server</th>
+                <th>IP</th>
+                <th>CDN/WAF</th>
+                <th>Time</th>
+            </tr>
+
+            </thead>
+
+
+            <tbody>
+
+            {% for item in observations %}
+
+            <tr data-recon-source-engine="httpx" data-recon-run-id="{{ run.id }}" data-recon-record-id="{{ item.id }}">
+
+                <td>
+
+                    {% if item.screenshot_hash %}
+
+                    <a
+                        href="{{ url_for(
+                            'httpx_screenshot',
+                            slug=project.config.project.slug,
+                            hash_value=item.screenshot_hash
+                        ) }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+
+                        <img
+                            class="table-shot"
+                            loading="lazy"
+                            src="{{ url_for(
+                                'httpx_screenshot_thumb',
+                                slug=project.config.project.slug,
+                                hash_value=item.screenshot_hash
+                            ) }}"
+                            alt=""
+                        >
+
+                    </a>
+
+                    {% else %}
+
+                    <span class="muted">
+                        —
+                    </span>
+
+                    {% endif %}
+
+                </td>
+
+
+                <td>
+
+                    <span
+                        class="http-status status-code-{{ item.status_code // 100 if item.status_code else 0 }}"
+                    >
+                        {{ item.status_code or "?" }}
+                    </span>
+
+                </td>
+
+
+                <td class="url-cell">
+
+                    <a
+                        href="{{ item.url }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        {{ item.url }}
+                    </a>
+
+                    {% if item.redirect_location %}
+
+                    <div class="redirect-inline">
+                        ↳ {{ item.redirect_location }}
+                    </div>
+
+                    {% endif %}
+
+                </td>
+
+
+                <td>
+                    {{ item.title or "—" }}
+                </td>
+
+
+                <td class="mono">
+                    {{ item.server or "—" }}
+                </td>
+
+
+                <td class="mono">
+                    {{ item.ip or "—" }}
+                </td>
+
+
+                <td>
+
+                    {% if item.cdn_name %}
+
+                        {{ item.cdn_name }}
+
+                        {% if item.cdn_type %}
+                            · {{ item.cdn_type }}
+                        {% endif %}
+
+                    {% elif item.cdn %}
+
+                        {{ item.cdn }}
+
+                    {% else %}
+
+                        —
+
+                    {% endif %}
+
+                </td>
+
+
+                <td class="mono">
+
+                    {% if item.response_time_ms is not none %}
+
+                        {{ "%.1f"|format(item.response_time_ms) }}
+                        ms
+
+                    {% else %}
+
+                        —
+
+                    {% endif %}
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    {% if pages > 1 %}
+
+    <div class="pagination">
+
+        {% if page > 1 %}
+
+        <a
+            class="button secondary"
+            href="?page={{ page - 1 }}"
+        >
+            Previous
+        </a>
+
+        {% endif %}
+
+        <span class="muted">
+            Page {{ page }} / {{ pages }}
+        </span>
+
+        {% if page < pages %}
+
+        <a
+            class="button secondary"
+            href="?page={{ page + 1 }}"
+        >
+            Next
+        </a>
+
+        {% endif %}
+
+    </div>
+
+    {% endif %}
+
+</section>
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+            <h2>
+                Redirect Chain
+            </h2>
+        </div>
+
+    </div>
+
+
+    {% if redirects %}
+
+    <div class="redirect-list">
+
+        {% for redirect in redirects %}
+
+        <div class="redirect-edge">
+
+            <div class="redirect-depth">
+                depth {{ redirect.depth }}
+            </div>
+
+            <div class="redirect-source mono">
+                {{ redirect.source }}
+            </div>
+
+            <div class="redirect-arrow">
+
+                <span class="http-status status-code-3">
+                    {{ redirect.status_code }}
+                </span>
+
+                →
+
+            </div>
+
+            <div class="redirect-destination mono">
+                {{ redirect.destination }}
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <p class="muted">
+        No redirects were recorded during this run.
+    </p>
+
+    {% endif %}
+
+</section>
+
+
+<style>
+
+.handoff-panel {
+    border-color:
+        rgba(152, 119, 255, 0.32);
+}
+
+
+.nuclei-handoff {
+    border-color:
+        rgba(255, 170, 70, 0.28);
+}
+
+
+.handoff-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(160px, 1fr)
+        );
+
+    gap: 14px;
+}
+
+
+.handoff-text-grid {
+    margin-top: 18px;
+}
+
+
+.handoff-options,
+.severity-options {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 16px;
+
+    margin-top: 18px;
+}
+
+
+.handoff-options label,
+.severity-options label {
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    font-size: 12px;
+}
+
+
+.handoff-note {
+    margin-top: 18px;
+
+    padding: 12px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 8px;
+
+    color: var(--muted);
+
+    font-size: 11px;
+
+    line-height: 1.55;
+}
+
+
+.visual-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fill,
+            minmax(260px, 1fr)
+        );
+
+    gap: 14px;
+}
+
+
+.visual-card {
+    overflow: hidden;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 10px;
+
+    background:
+        rgba(255, 255, 255, 0.018);
+}
+
+
+.visual-card img {
+    display: block;
+
+    width: 100%;
+    height: 180px;
+
+    object-fit: contain;
+    object-position: center;
+    background: #090c14;
+}
+
+
+.visual-info {
+    padding: 11px;
+}
+
+
+.visual-title {
+    margin-bottom: 6px;
+
+    font-weight: 600;
+}
+
+
+.visual-url {
+    overflow: hidden;
+
+    color: var(--muted);
+
+    font-size: 10px;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+
+.table-shot {
+    width: 100px;
+    height: 62px;
+
+    object-fit: contain;
+    object-position: center;
+    background: #090c14;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 5px;
+}
+
+</style>
+
+
+{% endblock %}

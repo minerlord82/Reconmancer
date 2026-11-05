@@ -1,0 +1,329 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <meta
+        name="theme-color"
+        content="#0b0c15"
+    >
+
+    <title>
+        {% block title %}
+        Reconmancer
+        {% endblock %}
+    </title>
+
+    <link
+        rel="icon"
+        type="image/png"
+        sizes="32x32"
+        href="{{ url_for('static', filename='img/reconmancer-favicon-32.png') }}"
+    >
+
+    <link
+        rel="icon"
+        type="image/png"
+        sizes="64x64"
+        href="{{ url_for('static', filename='img/reconmancer-favicon-64.png') }}"
+    >
+
+    <link
+        rel="apple-touch-icon"
+        sizes="180x180"
+        href="{{ url_for('static', filename='img/apple-touch-icon.png') }}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/app.css') }}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/auth-execution.css') }}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/context-handoffs.css') }}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/findings.css') }}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/workflow.css') }}"
+    >
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/arcane-v014.css') }}">
+
+</head>
+
+<body class="{% if project %}has-quest{% if request.path == '/p/' ~ project.config.project.slug ~ '/' %} realm-overview{% endif %}{% else %}registry-view{% endif %}" data-route="{{ request.path }}">
+
+<header class="topbar">
+
+    <a
+        class="brand"
+        href="/"
+        aria-label="Reconmancer home"
+    >
+
+        <img
+            class="brand-mark-image"
+            src="{{ url_for('static', filename='img/reconmancer-mark.webp') }}"
+            alt=""
+            width="38"
+            height="38"
+        >
+
+        <span class="brand-lockup">
+
+            <span class="brand-word">
+                Reconmancer
+            </span>
+
+            <span class="brand-subtitle">
+                ARCANE RECONNAISSANCE
+            </span>
+
+        </span>
+
+    </a>
+
+    {% if project %}
+
+    <div class="quest-name">
+
+        <span class="quest-rune">✦</span>
+        {{ project.config.project.name }}
+
+    </div>
+
+    {% else %}
+
+    <div class="topbar-motto">
+        SEE FURTHER · UNCOVER MORE
+    </div>
+
+    {% endif %}
+
+</header>
+
+<div class="layout">
+
+    {% if project %}
+
+    <aside class="sidebar" aria-label="Quest navigation">
+        <div class="nav-scene" aria-hidden="true"></div>
+        <a class="sidebar-brand" href="/p/{{ project.config.project.slug }}/" aria-label="Quest overview">
+            <img src="{{ url_for('static', filename='img/reconmancer-mark.webp') }}" alt="" width="47" height="47">
+            <span class="sidebar-brand-type"><span>Reconmancer</span><small>v0.1.4</small></span>
+        </a>
+
+        <a
+            class="nav-item nav-overview
+            {% if request.path == '/p/' ~ project.config.project.slug ~ '/' %}
+            active
+            {% endif %}"
+            href="/p/{{ project.config.project.slug }}/"
+        >
+            <span class="nav-glyph nav-glyph-rune">✦</span>
+            <span>Overview</span>
+        </a>
+
+        <div class="nav-divider">
+            <span>RECON ENGINES</span>
+        </div>
+
+        <a
+            class="nav-item
+            {% if '/httpx/' in request.path %}
+            active
+            {% endif %}"
+            href="/p/{{ project.config.project.slug }}/httpx/"
+        >
+            <img
+                class="nav-icon-image"
+                src="{{ url_for('static', filename='img/rune-httpx.webp') }}"
+                alt=""
+                width="20"
+                height="20"
+            >
+            <span>HTTPX</span>
+        </a>
+
+        <a
+            class="nav-item
+            {% if '/katana/' in request.path %}
+            active
+            {% endif %}"
+            href="/p/{{ project.config.project.slug }}/katana/"
+        >
+            <img
+                class="nav-icon-image"
+                src="{{ url_for('static', filename='img/rune-katana.webp') }}"
+                alt=""
+                width="20"
+                height="20"
+            >
+            <span>Katana</span>
+        </a>
+
+        <a
+            class="nav-item
+            {% if '/nuclei/' in request.path %}
+            active
+            {% endif %}"
+            href="/p/{{ project.config.project.slug }}/nuclei/"
+        >
+            <img
+                class="nav-icon-image"
+                src="{{ url_for('static', filename='img/rune-nuclei.webp') }}"
+                alt=""
+                width="20"
+                height="20"
+            >
+            <span>Nuclei</span>
+        </a>
+
+        <div class="nav-divider">
+            <span>INVESTIGATION</span>
+        </div>
+
+        <a
+            class="nav-item
+            {% if '/findings/' in request.path %}
+            active
+            {% endif %}"
+            href="/p/{{ project.config.project.slug }}/findings/"
+        >
+            <img class="nav-icon-image" src="{{ url_for('static', filename='img/rune-findings.webp') }}" alt="" width="20" height="20">
+            <span>Findings</span>
+        </a>
+
+        <a
+            class="nav-item {% if '/analysis/' in request.path %}active{% endif %}"
+            href="/p/{{ project.config.project.slug }}/analysis/"
+        >
+            <img
+                class="nav-icon-image"
+                src="{{ url_for('static', filename='img/rune-analysis.webp') }}"
+                alt=""
+                width="20"
+                height="20"
+            >
+            <span>Analysis</span>
+        </a>
+
+        <a
+            class="nav-item {% if '/evidence/' in request.path %}active{% endif %}"
+            href="/p/{{ project.config.project.slug }}/evidence/"
+        >
+            <img class="nav-icon-image" src="{{ url_for('static', filename='img/rune-evidence.webp') }}" alt="" width="20" height="20">
+            <span>Traffic Evidence</span>
+        </a>
+
+        <div class="nav-divider">
+            <span>PROJECT</span>
+        </div>
+
+        <a
+            class="nav-item
+            {% if '/runs/' in request.path %}
+            active
+            {% endif %}"
+            href="/p/{{ project.config.project.slug }}/runs/"
+        >
+            <img class="nav-icon-image" src="{{ url_for('static', filename='img/rune-runs.webp') }}" alt="" width="20" height="20">
+            <span>Runs</span>
+        </a>
+
+        <a
+            class="nav-item {% if '/jobs/' in request.path %}active{% endif %}"
+            href="/p/{{ project.config.project.slug }}/jobs/"
+        >
+            <img class="nav-icon-image" src="{{ url_for('static', filename='img/rune-jobs.webp') }}" alt="" width="20" height="20">
+            <span>Jobs</span>
+        </a>
+
+        <a
+            class="nav-item
+            {% if '/storage/' in request.path %}
+            active
+            {% endif %}"
+            href="/p/{{ project.config.project.slug }}/storage/"
+        >
+            <img class="nav-icon-image" src="{{ url_for('static', filename='img/rune-storage.webp') }}" alt="" width="20" height="20">
+            <span>Storage</span>
+        </a>
+
+        <a
+            class="nav-item
+            {% if '/settings/' in request.path %}
+            active
+            {% endif %}"
+            href="/p/{{ project.config.project.slug }}/settings/"
+        >
+            <img class="nav-icon-image" src="{{ url_for('static', filename='img/rune-settings.webp') }}" alt="" width="20" height="20">
+            <span>Settings</span>
+        </a>
+
+        <div class="sidebar-signature">
+            <span class="sidebar-signature-mark">✧</span>
+            <span>v0.1.4 · ARCANE ATLAS</span>
+        </div>
+
+        <a class="sidebar-registry" href="/">‹ QUEST REGISTRY</a>
+    </aside>
+
+    {% endif %}
+
+    <main class="content">
+        <div class="chapter-rule" aria-hidden="true"><span>✧</span><span>RECONMANCER <span class="chapter-rule-slash">/</span> FIELD JOURNAL</span><span>✧</span></div>
+
+        {% block content %}
+        {% endblock %}
+
+    </main>
+
+</div>
+
+{% if project %}
+
+<script
+    id="reconmancer-auth-profiles"
+    type="application/json"
+>
+{{ scan_auth_profiles|default([])|tojson }}
+</script>
+
+<script
+    src="{{ url_for('static', filename='js/auth-execution.js') }}"
+></script>
+
+<script
+    src="{{ url_for('static', filename='js/context-handoffs.js') }}"
+></script>
+
+<script
+    src="{{ url_for('static', filename='js/handoff-selection.js') }}"
+></script>
+
+{% endif %}
+
+</body>
+
+</html>

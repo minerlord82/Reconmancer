@@ -1,0 +1,285 @@
+{% extends "base.html" %}
+
+{% block title %}
+Traffic Evidence · {{ project.config.project.name }}
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+  <div>
+
+    <div class="eyebrow">
+      PRESERVED TRAFFIC
+    </div>
+
+    <h1>
+      HTTP Request / Response Evidence
+    </h1>
+
+    <p class="muted">
+      Content-addressed request and response snapshots captured from
+      HTTPX, Katana and Nuclei. Common authentication headers are
+      redacted before storage.
+    </p>
+
+  </div>
+
+</div>
+
+
+<section class="panel">
+
+  <form
+    method="get"
+    class="workflow-filter-grid"
+  >
+
+    <input
+      class="form-input"
+      name="q"
+      value="{{ filters.q }}"
+      placeholder="URL, run ID, method or context"
+    >
+
+
+    <select
+      class="form-input"
+      name="engine"
+    >
+
+      <option value="">
+        All engines
+      </option>
+
+      {% for name in ['httpx', 'katana', 'nuclei'] %}
+
+      <option
+        value="{{ name }}"
+        {% if filters.engine == name %}
+        selected
+        {% endif %}
+      >
+        {{ name|upper }}
+      </option>
+
+      {% endfor %}
+
+    </select>
+
+
+    <input
+      class="form-input"
+      name="run_id"
+      value="{{ filters.run_id }}"
+      placeholder="Run ID"
+    >
+
+
+    <button
+      class="button secondary"
+      type="submit"
+    >
+      Filter
+    </button>
+
+  </form>
+
+</section>
+
+
+<section class="panel">
+
+  <div class="panel-header">
+
+    <div>
+
+      <h2>
+        Evidence
+      </h2>
+
+      <p class="muted">
+        {{ evidence["total"] }} captured source record(s)
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <div class="table-wrap">
+
+    <table class="data-table">
+
+      <thead>
+
+        <tr>
+          <th>Engine</th>
+          <th>Run / Record</th>
+          <th>Method</th>
+          <th>Status</th>
+          <th>URL</th>
+          <th>Context</th>
+          <th>Request</th>
+          <th>Response</th>
+        </tr>
+
+      </thead>
+
+
+      <tbody>
+
+      {% for item in evidence["items"] %}
+
+        <tr>
+
+          <td>
+            {{ item.source_engine|upper }}
+          </td>
+
+
+          <td class="mono">
+            {{ item.source_run_id }}
+            /
+            {{ item.source_record_id }}
+          </td>
+
+
+          <td>
+            {{ item.method or '—' }}
+          </td>
+
+
+          <td>
+
+            {% if item.status_code is not none %}
+              {{ item.status_code }}
+            {% else %}
+              —
+            {% endif %}
+
+          </td>
+
+
+          <td class="workflow-url">
+            {{ item.url or '—' }}
+          </td>
+
+
+          <td class="mono">
+            {{ item.context }}
+          </td>
+
+
+          <td>
+
+            {% if item.request_hash %}
+
+            <a
+              class="button secondary"
+              target="_blank"
+              href="/p/{{ project.config.project.slug }}/evidence/{{ item.id }}/request/"
+            >
+              View
+              {% if item.request_truncated %}
+              · truncated
+              {% endif %}
+            </a>
+
+            {% else %}
+
+            —
+
+            {% endif %}
+
+          </td>
+
+
+          <td>
+
+            {% if item.response_hash %}
+
+            <a
+              class="button secondary"
+              target="_blank"
+              href="/p/{{ project.config.project.slug }}/evidence/{{ item.id }}/response/"
+            >
+              View
+              {% if item.response_truncated %}
+              · truncated
+              {% endif %}
+            </a>
+
+            {% else %}
+
+            —
+
+            {% endif %}
+
+          </td>
+
+        </tr>
+
+      {% else %}
+
+        <tr>
+
+          <td colspan="8" class="muted">
+            No request/response evidence has been captured yet.
+          </td>
+
+        </tr>
+
+      {% endfor %}
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  {% if evidence["pages"] > 1 %}
+
+  <div class="workflow-pagination">
+
+
+    {% if evidence["page"] > 1 %}
+
+    <a
+      class="button secondary"
+      href="?page={{ evidence['page'] - 1 }}&engine={{ filters.engine }}&run_id={{ filters.run_id }}&q={{ filters.q }}"
+    >
+      ← Previous
+    </a>
+
+    {% endif %}
+
+
+    <span>
+      {{ evidence["page"] }}
+      /
+      {{ evidence["pages"] }}
+    </span>
+
+
+    {% if evidence["page"] < evidence["pages"] %}
+
+    <a
+      class="button secondary"
+      href="?page={{ evidence['page'] + 1 }}&engine={{ filters.engine }}&run_id={{ filters.run_id }}&q={{ filters.q }}"
+    >
+      Next →
+    </a>
+
+    {% endif %}
+
+
+  </div>
+
+  {% endif %}
+
+</section>
+
+{% endblock %}

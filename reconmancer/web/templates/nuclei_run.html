@@ -1,0 +1,501 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+{{ run.id }} · Nuclei · Reconmancer
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="page-header">
+
+    <div>
+
+        <div class="eyebrow">
+            NUCLEI RUN
+        </div>
+
+        <h1>
+            {{ run.id }}
+        </h1>
+
+        <p class="muted">
+            {{ run.profile }}
+            ·
+            {{ run.started_at }}
+        </p>
+
+    </div>
+
+
+    <span class="run-status status-{{ run.status }}">
+        {{ run.status }}
+    </span>
+
+</div>
+
+
+<div class="stats-grid">
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Findings
+        </span>
+
+        <strong class="stat-value">
+            {{ stats.total }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Critical
+        </span>
+
+        <strong class="stat-value">
+            {{ stats.critical }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            High
+        </span>
+
+        <strong class="stat-value">
+            {{ stats.high }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Medium
+        </span>
+
+        <strong class="stat-value">
+            {{ stats.medium }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Low
+        </span>
+
+        <strong class="stat-value">
+            {{ stats.low }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Info
+        </span>
+
+        <strong class="stat-value">
+            {{ stats.info }}
+        </strong>
+
+    </div>
+
+
+</div>
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Findings
+            </h2>
+
+            <p class="muted">
+                {{ total }} deduplicated findings.
+                Original Nuclei JSONL remains preserved.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if findings %}
+
+
+    <div class="table-wrap">
+
+        <table class="data-table">
+
+            <thead>
+
+            <tr>
+
+                <th>Severity</th>
+                <th>Finding</th>
+                <th>Template</th>
+                <th>Matched At</th>
+                <th>CVEs</th>
+                <th>CVSS</th>
+
+            </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+            {% for item in findings %}
+
+
+            <tr data-recon-source-engine="nuclei" data-recon-run-id="{{ run.id }}" data-recon-record-id="{{ item.id }}">
+
+
+                <td>
+
+                    <span
+                        class="nuclei-severity nuclei-{{ item.severity }}"
+                    >
+                        {{ item.severity }}
+                    </span>
+
+                </td>
+
+
+                <td>
+
+                    <div class="finding-name">
+                        {{ item.name or item.template_id or "Finding" }}
+                    </div>
+
+
+                    {% if item.matcher_name %}
+
+                    <div class="muted finding-detail">
+                        matcher:
+                        {{ item.matcher_name }}
+                    </div>
+
+                    {% endif %}
+
+
+                    {% if item.description %}
+
+                    <div class="muted finding-description">
+                        {{ item.description }}
+                    </div>
+
+                    {% endif %}
+
+                </td>
+
+
+                <td class="mono">
+
+                    {{ item.template_id or "—" }}
+
+                </td>
+
+
+                <td class="url-cell">
+
+                    {% if item.matched_at %}
+
+                    <a
+                        href="{{ item.matched_at }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        {{ item.matched_at }}
+                    </a>
+
+                    {% elif item.url %}
+
+                    <a
+                        href="{{ item.url }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        {{ item.url }}
+                    </a>
+
+                    {% else %}
+
+                        {{ item.host or "—" }}
+
+                    {% endif %}
+
+
+                    {% if item.ip %}
+
+                    <div class="muted mono">
+                        {{ item.ip }}
+                    </div>
+
+                    {% endif %}
+
+                </td>
+
+
+                <td class="mono">
+
+                    {% if item.cve_json %}
+
+                        {{ item.cve_json }}
+
+                    {% else %}
+
+                        —
+
+                    {% endif %}
+
+                </td>
+
+
+                <td>
+
+                    {% if item.cvss_score is not none %}
+
+                        {{ item.cvss_score }}
+
+                    {% else %}
+
+                        —
+
+                    {% endif %}
+
+                </td>
+
+
+            </tr>
+
+
+            {% endfor %}
+
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    {% else %}
+
+
+    <div class="empty-state">
+
+        <h2>
+            No findings
+        </h2>
+
+        <p>
+            Nuclei completed without reporting
+            a matching template finding.
+        </p>
+
+    </div>
+
+
+    {% endif %}
+
+
+    {% if pages > 1 %}
+
+
+    <div class="pagination">
+
+
+        {% if page > 1 %}
+
+        <a
+            class="button secondary"
+            href="?page={{ page - 1 }}"
+        >
+            Previous
+        </a>
+
+        {% endif %}
+
+
+        <span class="muted">
+            Page {{ page }} / {{ pages }}
+        </span>
+
+
+        {% if page < pages %}
+
+        <a
+            class="button secondary"
+            href="?page={{ page + 1 }}"
+        >
+            Next
+        </a>
+
+        {% endif %}
+
+
+    </div>
+
+
+    {% endif %}
+
+</section>
+
+
+<style>
+
+.nuclei-severity {
+    display: inline-block;
+
+    min-width: 64px;
+
+    padding:
+        5px 7px;
+
+    border-radius: 6px;
+
+    text-align: center;
+
+    text-transform: uppercase;
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: .05em;
+}
+
+
+.nuclei-critical {
+    background:
+        rgba(
+            255,
+            65,
+            95,
+            .15
+        );
+
+    color:
+        #ff7188;
+}
+
+
+.nuclei-high {
+    background:
+        rgba(
+            255,
+            110,
+            70,
+            .14
+        );
+
+    color:
+        #ff9473;
+}
+
+
+.nuclei-medium {
+    background:
+        rgba(
+            255,
+            190,
+            70,
+            .13
+        );
+
+    color:
+        #ffd078;
+}
+
+
+.nuclei-low {
+    background:
+        rgba(
+            85,
+            175,
+            255,
+            .12
+        );
+
+    color:
+        #8ccaff;
+}
+
+
+.nuclei-info {
+    background:
+        rgba(
+            150,
+            150,
+            180,
+            .12
+        );
+
+    color:
+        #bcbcd0;
+}
+
+
+.nuclei-unknown {
+    background:
+        rgba(
+            180,
+            130,
+            255,
+            .12
+        );
+
+    color:
+        #c7a8ff;
+}
+
+
+.finding-name {
+    font-weight: 600;
+
+    margin-bottom: 4px;
+}
+
+
+.finding-detail {
+    font-size: 10px;
+}
+
+
+.finding-description {
+    max-width: 500px;
+
+    margin-top: 6px;
+
+    font-size: 11px;
+
+    line-height: 1.4;
+}
+
+</style>
+
+
+{% endblock %}

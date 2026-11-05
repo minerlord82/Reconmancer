@@ -1,0 +1,1693 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Findings · {{ project.config.project.name }}
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="page-header">
+
+    <div>
+
+        <div class="eyebrow">
+            INVESTIGATION WORKSPACE
+        </div>
+
+        <h1>
+            Evidence & Findings
+        </h1>
+
+        <p class="muted">
+            Correlate recon results, filter interesting
+            responses and preserve investigation evidence.
+        </p>
+
+    </div>
+
+</div>
+
+
+{% if message %}
+
+<div class="findings-message">
+    {{ message }}
+</div>
+
+{% endif %}
+
+
+{% if error %}
+
+<div class="findings-error">
+    {{ error }}
+</div>
+
+{% endif %}
+
+
+<div class="stats-grid">
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Findings
+        </span>
+
+        <strong class="stat-value">
+            {{ workspace.counts.findings }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Pinned
+        </span>
+
+        <strong class="stat-value">
+            {{ workspace.counts.pins }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Evidence
+        </span>
+
+        <strong class="stat-value">
+            {{ workspace.counts.evidence }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            High / Critical
+        </span>
+
+        <strong class="stat-value">
+
+            {{
+                workspace.counts.high
+                +
+                workspace.counts.critical
+            }}
+
+        </strong>
+
+    </div>
+
+</div>
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Active Findings
+            </h2>
+
+            <p class="muted">
+                Current investigation records.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if workspace.findings %}
+
+    <div class="findings-grid">
+
+        {% for finding in workspace.findings %}
+
+        <a
+            class="finding-card"
+            href="/p/{{ project.config.project.slug }}/findings/{{ finding.id }}/"
+        >
+
+            <div class="finding-card-title">
+
+                {{ finding.id }}
+                ·
+                {{ finding.title }}
+
+            </div>
+
+
+            <div class="finding-meta">
+
+                <span class="severity-{{ finding.severity }}">
+                    {{ finding.severity|upper }}
+                </span>
+
+                <span>
+                    {{ finding.status }}
+                </span>
+
+                {% if finding.host %}
+
+                <span>
+                    {{ finding.host }}
+                </span>
+
+                {% endif %}
+
+                <span>
+                    {{ finding.source_count }} sources
+                </span>
+
+                <span>
+                    {{ finding.evidence_count }} evidence
+                </span>
+
+            </div>
+
+        </a>
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <p class="muted">
+        No active findings yet.
+    </p>
+
+    {% endif %}
+
+</section>
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Host Correlation
+            </h2>
+
+            <p class="muted">
+
+                Status counts are clickable.
+
+                The matrix respects the current
+                Anonymous / Authenticated context filter.
+
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="table-wrap">
+
+        <table class="data-table correlation-table">
+
+            <thead>
+
+            <tr>
+
+                <th>Host</th>
+
+                <th>HTTPX</th>
+
+                <th>Katana</th>
+
+                <th>Nuclei</th>
+
+                <th>2xx</th>
+
+                <th>3xx</th>
+
+                <th>401</th>
+
+                <th>403</th>
+
+                <th>404</th>
+
+                <th>405</th>
+
+                <th>429</th>
+
+                <th>5xx</th>
+
+                <th>High</th>
+
+                <th>Critical</th>
+
+            </tr>
+
+            </thead>
+
+
+            <tbody>
+
+            {% for item in workspace.correlations %}
+
+            <tr>
+
+                <td>
+
+                    <a
+                        class="correlation-host"
+                        href="{{ url_for(
+                            'findings_workspace.findings_index',
+                            slug=project.config.project.slug,
+                            host=item.host,
+                            context=workspace.filters.context
+                        ) }}"
+                    >
+                        {{ item.host }}
+                    </a>
+
+                </td>
+
+
+                <td>
+                    {{ item.httpx }}
+                </td>
+
+
+                <td>
+                    {{ item.katana }}
+                </td>
+
+
+                <td>
+                    {{ item.nuclei }}
+                </td>
+
+
+                <td>
+
+                    {% if item.status_2xx %}
+
+                    <a
+                        class="status-link status-2xx"
+                        href="{{ url_for(
+                            'findings_workspace.findings_index',
+                            slug=project.config.project.slug,
+                            host=item.host,
+                            status='2xx',
+                            context=workspace.filters.context
+                        ) }}"
+                    >
+                        {{ item.status_2xx }}
+                    </a>
+
+                    {% else %}
+
+                    0
+
+                    {% endif %}
+
+                </td>
+
+
+                <td>
+
+                    {% if item.status_3xx %}
+
+                    <a
+                        class="status-link status-3xx"
+                        href="{{ url_for(
+                            'findings_workspace.findings_index',
+                            slug=project.config.project.slug,
+                            host=item.host,
+                            status='3xx',
+                            context=workspace.filters.context
+                        ) }}"
+                    >
+                        {{ item.status_3xx }}
+                    </a>
+
+                    {% else %}
+
+                    0
+
+                    {% endif %}
+
+                </td>
+
+
+                {% for code, value in [
+                    ('401', item.status_401),
+                    ('403', item.status_403),
+                    ('404', item.status_404),
+                    ('405', item.status_405),
+                    ('429', item.status_429)
+                ] %}
+
+                <td>
+
+                    {% if value %}
+
+                    <a
+                        class="status-link status-{{ code }}"
+                        href="{{ url_for(
+                            'findings_workspace.findings_index',
+                            slug=project.config.project.slug,
+                            host=item.host,
+                            status=code,
+                            context=workspace.filters.context
+                        ) }}"
+                    >
+                        {{ value }}
+                    </a>
+
+                    {% else %}
+
+                    0
+
+                    {% endif %}
+
+                </td>
+
+                {% endfor %}
+
+
+                <td>
+
+                    {% if item.status_5xx %}
+
+                    <a
+                        class="status-link status-5xx"
+                        href="{{ url_for(
+                            'findings_workspace.findings_index',
+                            slug=project.config.project.slug,
+                            host=item.host,
+                            status='5xx',
+                            context=workspace.filters.context
+                        ) }}"
+                    >
+                        {{ item.status_5xx }}
+                    </a>
+
+                    {% else %}
+
+                    0
+
+                    {% endif %}
+
+                </td>
+
+
+                <td class="severity-high">
+                    {{ item.high }}
+                </td>
+
+
+                <td class="severity-critical">
+                    {{ item.critical }}
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+
+<section
+    class="panel"
+    id="source-browser"
+>
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Source Browser
+            </h2>
+
+            <p class="muted">
+
+                Server-side filters across HTTPX,
+                Katana and Nuclei.
+
+            </p>
+
+        </div>
+
+
+        <div class="mono muted">
+
+            {{ workspace.source_total }}
+            result{% if workspace.source_total != 1 %}s{% endif %}
+
+        </div>
+
+    </div>
+
+
+    <form
+        method="get"
+        action="/p/{{ project.config.project.slug }}/findings/"
+        class="advanced-filter-form"
+    >
+
+
+        <div class="advanced-filter-grid">
+
+
+            <div class="filter-wide">
+
+                <label class="form-label">
+                    Search
+                </label>
+
+                <input
+                    class="form-input"
+                    type="text"
+                    name="q"
+                    value="{{ workspace.filters.query }}"
+                    placeholder="URL, title, host, run ID, template..."
+                >
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Engine
+                </label>
+
+                <select
+                    class="form-input"
+                    name="engine"
+                >
+
+                    {% for value, label in [
+                        ('all', 'All engines'),
+                        ('httpx', 'HTTPX'),
+                        ('katana', 'Katana'),
+                        ('nuclei', 'Nuclei')
+                    ] %}
+
+                    <option
+                        value="{{ value }}"
+                        {% if workspace.filters.engine == value %}
+                        selected
+                        {% endif %}
+                    >
+                        {{ label }}
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Status
+                </label>
+
+                <select
+                    class="form-input"
+                    name="status"
+                >
+
+                    <option value="">
+                        Any status
+                    </option>
+
+                    {% for value in [
+                        '2xx',
+                        '3xx',
+                        '4xx',
+                        '5xx',
+                        '200',
+                        '201',
+                        '204',
+                        '301',
+                        '302',
+                        '307',
+                        '308',
+                        '400',
+                        '401',
+                        '403',
+                        '404',
+                        '405',
+                        '409',
+                        '429',
+                        '500',
+                        '502',
+                        '503'
+                    ] %}
+
+                    <option
+                        value="{{ value }}"
+                        {% if workspace.filters.status == value %}
+                        selected
+                        {% endif %}
+                    >
+                        {{ value }}
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+                <div class="form-help">
+                    HTTPX / Katana only
+                </div>
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Context
+                </label>
+
+                <select
+                    class="form-input"
+                    name="context"
+                >
+
+                    <option
+                        value="all"
+                        {% if workspace.filters.context == "all" %}
+                        selected
+                        {% endif %}
+                    >
+                        All contexts
+                    </option>
+
+                    <option
+                        value="anonymous"
+                        {% if workspace.filters.context == "anonymous" %}
+                        selected
+                        {% endif %}
+                    >
+                        Anonymous
+                    </option>
+
+                    <option
+                        value="authenticated"
+                        {% if workspace.filters.context == "authenticated" %}
+                        selected
+                        {% endif %}
+                    >
+                        Authenticated
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Exact Host
+                </label>
+
+                <input
+                    class="form-input"
+                    type="text"
+                    name="host"
+                    value="{{ workspace.filters.host }}"
+                    placeholder="api.example.com"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Nuclei Severity
+                </label>
+
+                <select
+                    class="form-input"
+                    name="severity"
+                >
+
+                    <option value="">
+                        Any severity
+                    </option>
+
+                    {% for value in [
+                        'critical',
+                        'high',
+                        'medium',
+                        'low',
+                        'info',
+                        'unknown'
+                    ] %}
+
+                    <option
+                        value="{{ value }}"
+                        {% if workspace.filters.severity == value %}
+                        selected
+                        {% endif %}
+                    >
+                        {{ value|capitalize }}
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Nuclei Template
+                </label>
+
+                <input
+                    class="form-input"
+                    type="text"
+                    name="template_id"
+                    value="{{ workspace.filters.template_id }}"
+                    placeholder="exposed-panels..."
+                >
+
+            </div>
+
+
+        </div>
+
+
+        <div class="filter-checks">
+
+
+            <label class="filter-check">
+
+                <input
+                    type="checkbox"
+                    name="interesting"
+                    value="1"
+                    {% if workspace.filters.interesting %}
+                    checked
+                    {% endif %}
+                >
+
+                <span>
+
+                    <strong>
+                        Interesting responses
+                    </strong>
+
+                    <small>
+                        401, 403, 405, 429 and all 5xx
+                    </small>
+
+                </span>
+
+            </label>
+
+
+            <label class="filter-check">
+
+                <input
+                    type="checkbox"
+                    name="pinned"
+                    value="1"
+                    {% if workspace.filters.pinned_only %}
+                    checked
+                    {% endif %}
+                >
+
+                <span>
+
+                    <strong>
+                        Pinned only
+                    </strong>
+
+                    <small>
+                        Show observations already pinned
+                    </small>
+
+                </span>
+
+            </label>
+
+
+        </div>
+
+
+        <div class="filter-actions">
+
+            <button
+                class="button scan-button"
+                type="submit"
+            >
+                Apply Filters
+            </button>
+
+
+            <a
+                class="button secondary"
+                href="/p/{{ project.config.project.slug }}/findings/#source-browser"
+            >
+                Clear
+            </a>
+
+        </div>
+
+    </form>
+
+
+    {% if workspace.filters.interesting %}
+
+    <div class="filter-active-banner">
+
+        Interesting-response mode is active:
+
+        <strong>
+            401 · 403 · 405 · 429 · 5xx
+        </strong>
+
+        Status dropdown is ignored while this preset
+        is enabled.
+
+    </div>
+
+    {% endif %}
+
+
+    <div class="source-page-meta">
+
+        Page
+        {{ workspace.page }}
+        of
+        {{ workspace.pages }}
+
+        ·
+
+        {{ workspace.source_total }}
+        matching observations
+
+    </div>
+
+
+    <div class="table-wrap">
+
+        <table class="data-table">
+
+            <thead>
+
+            <tr>
+
+                <th>Engine</th>
+
+                <th>Status</th>
+
+                <th>Severity</th>
+
+                <th>Run</th>
+
+                <th>Host / URL</th>
+
+                <th>Observation</th>
+
+                <th>Context</th>
+
+                <th></th>
+
+            </tr>
+
+            </thead>
+
+
+            <tbody>
+
+            {% for source in workspace.sources %}
+
+            <tr data-recon-source-engine="{{ source.engine }}" data-recon-run-id="{{ source.run_id }}" data-recon-record-id="{{ source.record_id }}">
+
+
+                <td>
+                    {{ source.engine|upper }}
+                </td>
+
+
+                <td>
+
+                    {% if source.status_code is not none %}
+
+                    <a
+                        class="status-code status-code-{{ (source.status_code|string)[0] }}xx"
+                        href="{{ url_for(
+                            'findings_workspace.findings_index',
+                            slug=project.config.project.slug,
+                            status=source.status_code,
+                            host=source.host or '',
+                            context=workspace.filters.context
+                        ) }}"
+                    >
+                        {{ source.status_code }}
+                    </a>
+
+                    {% else %}
+
+                    <span class="muted">
+                        —
+                    </span>
+
+                    {% endif %}
+
+                </td>
+
+
+                <td>
+
+                    {% if source.severity %}
+
+                    <span class="severity-{{ source.severity }}">
+                        {{ source.severity|upper }}
+                    </span>
+
+                    {% else %}
+
+                    <span class="muted">
+                        —
+                    </span>
+
+                    {% endif %}
+
+                </td>
+
+
+                <td class="mono">
+                    {{ source.run_id }}
+                </td>
+
+
+                <td>
+
+                    <div class="mono">
+
+                        {% if source.host %}
+
+                        <a
+                            href="{{ url_for(
+                                'findings_workspace.findings_index',
+                                slug=project.config.project.slug,
+                                host=source.host,
+                                context=workspace.filters.context
+                            ) }}"
+                        >
+                            {{ source.host }}
+                        </a>
+
+                        {% else %}
+
+                        —
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="source-url muted">
+                        {{ source.url or "—" }}
+                    </div>
+
+                </td>
+
+
+                <td>
+
+                    <div>
+                        {{ source.title }}
+                    </div>
+
+
+                    <div class="muted">
+                        {{ source.summary }}
+                    </div>
+
+
+                    {% if source.template_id %}
+
+                    <div class="mono source-template">
+                        {{ source.template_id }}
+                    </div>
+
+                    {% endif %}
+
+                </td>
+
+
+                <td>
+
+                    {% if source.context.startswith("auth:") %}
+
+                    <span class="source-context-auth">
+                        AUTH
+                    </span>
+
+                    <span class="mono muted">
+                        {{ source.context[5:] }}
+                    </span>
+
+                    {% else %}
+
+                    <span class="source-context-anon">
+                        ANON
+                    </span>
+
+                    {% endif %}
+
+                </td>
+
+
+                <td>
+
+                    {% if source.pinned %}
+
+                    <form
+                        method="post"
+                        action="/p/{{ project.config.project.slug }}/findings/pin/{{ source.pin_id }}/remove/"
+                    >
+
+                        <input
+                            type="hidden"
+                            name="return_to"
+                            value="{{ request.full_path }}"
+                        >
+
+                        <button
+                            class="pin-badge pin-button"
+                            type="submit"
+                        >
+                            PINNED ×
+                        </button>
+
+                    </form>
+
+                    {% else %}
+
+                    <form
+                        method="post"
+                        action="/p/{{ project.config.project.slug }}/findings/pin/"
+                    >
+
+                        <input
+                            type="hidden"
+                            name="engine"
+                            value="{{ source.engine }}"
+                        >
+
+                        <input
+                            type="hidden"
+                            name="run_id"
+                            value="{{ source.run_id }}"
+                        >
+
+                        <input
+                            type="hidden"
+                            name="record_id"
+                            value="{{ source.record_id }}"
+                        >
+
+                        <input
+                            type="hidden"
+                            name="return_to"
+                            value="{{ request.full_path }}"
+                        >
+
+                        <button
+                            class="button secondary"
+                            type="submit"
+                        >
+                            Pin
+                        </button>
+
+                    </form>
+
+                    {% endif %}
+
+                </td>
+
+            </tr>
+
+            {% else %}
+
+            <tr>
+
+                <td
+                    colspan="8"
+                    class="muted"
+                >
+                    No source records match these filters.
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    {% if workspace.pages > 1 %}
+
+    <div class="source-pagination">
+
+
+        {% if workspace.page > 1 %}
+
+        <a
+            class="button secondary"
+            href="{{ url_for(
+                'findings_workspace.findings_index',
+                slug=project.config.project.slug,
+                page=workspace.page - 1,
+                engine=workspace.filters.engine,
+                status=workspace.filters.status,
+                interesting='1' if workspace.filters.interesting else '',
+                severity=workspace.filters.severity,
+                context=workspace.filters.context,
+                host=workspace.filters.host,
+                q=workspace.filters.query,
+                template_id=workspace.filters.template_id,
+                pinned='1' if workspace.filters.pinned_only else ''
+            ) }}#source-browser"
+        >
+            ← Previous
+        </a>
+
+        {% endif %}
+
+
+        <span class="source-pagination-label">
+
+            {{ workspace.page }}
+            /
+            {{ workspace.pages }}
+
+        </span>
+
+
+        {% if workspace.page < workspace.pages %}
+
+        <a
+            class="button secondary"
+            href="{{ url_for(
+                'findings_workspace.findings_index',
+                slug=project.config.project.slug,
+                page=workspace.page + 1,
+                engine=workspace.filters.engine,
+                status=workspace.filters.status,
+                interesting='1' if workspace.filters.interesting else '',
+                severity=workspace.filters.severity,
+                context=workspace.filters.context,
+                host=workspace.filters.host,
+                q=workspace.filters.query,
+                template_id=workspace.filters.template_id,
+                pinned='1' if workspace.filters.pinned_only else ''
+            ) }}#source-browser"
+        >
+            Next →
+        </a>
+
+        {% endif %}
+
+
+    </div>
+
+    {% endif %}
+
+</section>
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                New Finding
+            </h2>
+
+            <p class="muted">
+                Attach any pinned observations as provenance.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <form
+        method="post"
+        action="/p/{{ project.config.project.slug }}/findings/new/"
+    >
+
+        <div class="finding-editor-grid">
+
+            <div class="wide">
+
+                <label class="form-label">
+                    Title
+                </label>
+
+                <input
+                    class="form-input"
+                    type="text"
+                    name="title"
+                    required
+                >
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Severity
+                </label>
+
+                <select
+                    class="form-input"
+                    name="severity"
+                >
+
+                    <option value="info">Info</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                    <option value="critical">Critical</option>
+
+                </select>
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Status
+                </label>
+
+                <select
+                    class="form-input"
+                    name="status"
+                >
+
+                    <option value="draft">Draft</option>
+                    <option value="triage">Triage</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="reported">Reported</option>
+
+                </select>
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Host
+                </label>
+
+                <input
+                    class="form-input"
+                    name="host"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Primary URL
+                </label>
+
+                <input
+                    class="form-input"
+                    name="url"
+                >
+
+            </div>
+
+
+            <div class="wide">
+
+                <label class="form-label">
+                    Description
+                </label>
+
+                <textarea
+                    class="form-input finding-textarea"
+                    name="description"
+                ></textarea>
+
+            </div>
+
+
+            <div class="wide">
+
+                <label class="form-label">
+                    Reproduction
+                </label>
+
+                <textarea
+                    class="form-input finding-textarea"
+                    name="reproduction"
+                ></textarea>
+
+            </div>
+
+
+            <div class="wide">
+
+                <label class="form-label">
+                    Impact
+                </label>
+
+                <textarea
+                    class="form-input finding-textarea"
+                    name="impact"
+                ></textarea>
+
+            </div>
+
+
+            <div class="wide">
+
+                <label class="form-label">
+                    Remediation
+                </label>
+
+                <textarea
+                    class="form-input finding-textarea"
+                    name="remediation"
+                ></textarea>
+
+            </div>
+
+        </div>
+
+
+        {% if workspace.pins %}
+
+        <h3>
+            Attach pinned sources
+        </h3>
+
+
+        <div class="table-wrap">
+
+            <table class="data-table">
+
+                <thead>
+
+                <tr>
+
+                    <th></th>
+
+                    <th>Engine</th>
+
+                    <th>Run</th>
+
+                    <th>Host</th>
+
+                    <th>Observation</th>
+
+                </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                {% for pin in workspace.pins %}
+
+                <tr>
+
+                    <td>
+
+                        <input
+                            type="checkbox"
+                            name="pin_id"
+                            value="{{ pin.id }}"
+                        >
+
+                    </td>
+
+
+                    <td>
+                        {{ pin.source_engine|upper }}
+                    </td>
+
+
+                    <td class="mono">
+                        {{ pin.source_run_id }}
+                    </td>
+
+
+                    <td class="mono">
+                        {{ pin.host or "—" }}
+                    </td>
+
+
+                    <td>
+                        {{ pin.summary }}
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% endif %}
+
+
+        <button
+            class="button scan-button"
+            type="submit"
+        >
+            Create Finding
+        </button>
+
+    </form>
+
+</section>
+
+
+<style>
+
+.advanced-filter-form {
+    margin-bottom: 18px;
+}
+
+
+.advanced-filter-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            minmax(
+                150px,
+                1fr
+            )
+        );
+
+    gap: 12px;
+}
+
+
+.filter-wide {
+    grid-column:
+        span 2;
+}
+
+
+.filter-checks {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+
+    margin-top: 14px;
+}
+
+
+.filter-check {
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 8px;
+
+    padding: 10px 12px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 7px;
+
+    cursor: pointer;
+}
+
+
+.filter-check span {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+
+.filter-check small {
+    color: var(--muted);
+}
+
+
+.filter-actions {
+    display: flex;
+
+    gap: 8px;
+
+    margin-top: 14px;
+}
+
+
+.filter-active-banner {
+    margin-bottom: 14px;
+
+    padding: 10px 12px;
+
+    border:
+        1px solid rgba(255, 190, 70, .22);
+
+    border-radius: 7px;
+
+    background:
+        rgba(255, 190, 70, .05);
+
+    color:
+        #d8c89d;
+
+    font-size: 11px;
+}
+
+
+.source-page-meta {
+    margin-bottom: 10px;
+
+    color: var(--muted);
+
+    font-size: 10px;
+}
+
+
+.status-link,
+.status-code,
+.correlation-host {
+    text-decoration: none;
+}
+
+
+.status-link {
+    display: inline-flex;
+
+    min-width: 24px;
+
+    justify-content: center;
+
+    padding: 3px 5px;
+
+    border-radius: 5px;
+
+    font-weight: 700;
+}
+
+
+.status-2xx,
+.status-code-2xx {
+    color: #8fe1b4;
+}
+
+
+.status-3xx,
+.status-code-3xx {
+    color: #8bc5ff;
+}
+
+
+.status-401,
+.status-403,
+.status-405,
+.status-429,
+.status-code-4xx {
+    color: #ffd180;
+}
+
+
+.status-404 {
+    color: #aeb4c4;
+}
+
+
+.status-5xx,
+.status-code-5xx {
+    color: #ff9aa8;
+}
+
+
+.source-template {
+    margin-top: 5px;
+
+    font-size: 9px;
+
+    color: var(--muted);
+}
+
+
+.source-context-auth,
+.source-context-anon {
+    display: inline-block;
+
+    padding: 3px 5px;
+
+    border-radius: 5px;
+
+    font-size: 9px;
+
+    font-weight: 800;
+}
+
+
+.source-context-auth {
+    background:
+        rgba(155, 115, 255, .11);
+
+    color: #cebaff;
+}
+
+
+.source-context-anon {
+    background:
+        rgba(130, 140, 160, .08);
+
+    color: #aeb4c4;
+}
+
+
+.pin-button {
+    border: 0;
+
+    cursor: pointer;
+}
+
+
+.source-pagination {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 12px;
+
+    margin-top: 18px;
+}
+
+
+.source-pagination-label {
+    color: var(--muted);
+
+    font-size: 11px;
+}
+
+
+.correlation-table {
+    white-space: nowrap;
+}
+
+
+@media (
+    max-width: 1100px
+) {
+
+    .advanced-filter-grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(
+                    0,
+                    1fr
+                )
+            );
+    }
+
+}
+
+
+@media (
+    max-width: 650px
+) {
+
+    .advanced-filter-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .filter-wide {
+        grid-column:
+            auto;
+    }
+
+}
+
+</style>
+
+
+{% endblock %}

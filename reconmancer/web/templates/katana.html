@@ -1,0 +1,1223 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Katana · {{ project.config.project.name }}
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="page-header">
+
+    <div>
+
+        <div class="eyebrow">
+            KATANA ENGINE
+        </div>
+
+        <h1>
+            Katana
+        </h1>
+
+        <p class="muted">
+            Crawl URLs, JavaScript endpoints,
+            rendered DOM, runtime requests,
+            parameters and forms.
+        </p>
+
+    </div>
+
+
+    <div class="status-pill">
+        Discovery workspace
+    </div>
+
+</div>
+
+
+<section class="panel scan-panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                New Katana Crawl
+            </h2>
+
+            <p class="muted">
+                Choose the crawler profile according
+                to the application you are testing.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <form
+        method="post"
+        enctype="multipart/form-data"
+        action="/p/{{ project.config.project.slug }}/katana/new/"
+    >
+
+
+        <label class="form-label">
+            Crawl Profile
+        </label>
+
+
+        <div class="profile-grid">
+
+
+            <label class="profile-card">
+
+                <input
+                    type="radio"
+                    name="profile"
+                    value="standard"
+                    checked
+                >
+
+                <span>
+
+                    <strong>
+                        Standard
+                    </strong>
+
+                    <small>
+                        Fast and low-RAM. Parses raw HTML
+                        and JavaScript without launching
+                        Chromium.
+                    </small>
+
+                </span>
+
+            </label>
+
+
+            <label class="profile-card">
+
+                <input
+                    type="radio"
+                    name="profile"
+                    value="headless"
+                >
+
+                <span>
+
+                    <strong>
+                        Headless
+                    </strong>
+
+                    <small>
+                        Uses Chromium for rendered DOM,
+                        runtime JavaScript and XHR/fetch
+                        discovery.
+                    </small>
+
+                </span>
+
+            </label>
+
+
+            <label class="profile-card deep-profile">
+
+                <input
+                    type="radio"
+                    name="profile"
+                    value="deep"
+                >
+
+                <span>
+
+                    <strong>
+                        Deep
+                    </strong>
+
+                    <small>
+                        Headless crawling plus jsluice.
+                        Highest coverage and highest RAM
+                        usage.
+                    </small>
+
+                </span>
+
+            </label>
+
+
+        </div>
+
+
+        <div class="upload-zone">
+
+            <label class="form-label">
+                Upload targets.txt
+            </label>
+
+            <input
+                class="file-input"
+                type="file"
+                name="targets_file"
+                accept=".txt,text/plain"
+            >
+
+            <div class="form-help">
+                One starting URL per line.
+            </div>
+
+        </div>
+
+
+        <div class="input-separator">
+
+            <span>
+                OR
+            </span>
+
+        </div>
+
+
+        <label class="form-label">
+            Paste Starting URLs
+        </label>
+
+
+        <textarea
+            class="target-input"
+            name="targets"
+            rows="6"
+            placeholder="https://example.com&#10;https://app.example.com"
+        ></textarea>
+
+
+        <div class="katana-options">
+
+
+            <div>
+
+                <label class="form-label">
+                    Depth
+                </label>
+
+                <input
+                    class="form-input"
+                    type="number"
+                    name="depth"
+                    value="3"
+                    min="1"
+                    max="10"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Rate limit
+                </label>
+
+                <input
+                    class="form-input"
+                    type="number"
+                    name="rate_limit"
+                    value="20"
+                    min="1"
+                    max="500"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Concurrency
+                </label>
+
+                <input
+                    class="form-input"
+                    type="number"
+                    name="concurrency"
+                    value="5"
+                    min="1"
+                    max="50"
+                >
+
+                <div class="form-help">
+                    For headless/deep, 1–2 is
+                    recommended on this VPS.
+                </div>
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Parallel targets
+                </label>
+
+                <input
+                    class="form-input"
+                    type="number"
+                    name="parallelism"
+                    value="2"
+                    min="1"
+                    max="20"
+                >
+
+                <div class="form-help">
+                    Use 1 for headless/deep to
+                    minimize browser RAM.
+                </div>
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Page load strategy
+                </label>
+
+                <select
+                    class="form-input"
+                    name="page_load_strategy"
+                >
+
+                    <option
+                        value="heuristic"
+                        selected
+                    >
+                        heuristic
+                    </option>
+
+                    <option value="domcontentloaded">
+                        domcontentloaded
+                    </option>
+
+                    <option value="networkidle">
+                        networkidle
+                    </option>
+
+                    <option value="load">
+                        load
+                    </option>
+
+                    <option value="none">
+                        none
+                    </option>
+
+                </select>
+
+                <div class="form-help">
+                    Used only by Headless and Deep.
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <div class="feature-grid">
+
+
+            <label class="feature-option">
+
+                <input
+                    type="checkbox"
+                    name="js_crawl"
+                    value="1"
+                    checked
+                >
+
+                <span>
+
+                    <strong>
+                        JavaScript crawl
+                    </strong>
+
+                    <small>
+                        Parse JS files for endpoints.
+                    </small>
+
+                </span>
+
+            </label>
+
+
+            <label class="feature-option">
+
+                <input
+                    type="checkbox"
+                    name="known_files"
+                    value="1"
+                    checked
+                >
+
+                <span>
+
+                    <strong>
+                        Known files
+                    </strong>
+
+                    <small>
+                        Crawl robots.txt and sitemaps.
+                    </small>
+
+                </span>
+
+            </label>
+
+
+            <label class="feature-option">
+
+                <input
+                    type="checkbox"
+                    name="form_extraction"
+                    value="1"
+                    checked
+                >
+
+                <span>
+
+                    <strong>
+                        Form extraction
+                    </strong>
+
+                    <small>
+                        Record forms and input elements.
+                    </small>
+
+                </span>
+
+            </label>
+
+
+            <label class="feature-option">
+
+                <input
+                    type="checkbox"
+                    name="tech_detect"
+                    value="1"
+                    checked
+                >
+
+                <span>
+
+                    <strong>
+                        Technology detection
+                    </strong>
+
+                    <small>
+                        Preserve technology metadata.
+                    </small>
+
+                </span>
+
+            </label>
+
+
+            <label class="feature-option dangerous-option">
+
+                <input
+                    type="checkbox"
+                    name="no_scope"
+                    value="1"
+                >
+
+                <span>
+
+                    <strong>
+                        Disable Katana crawl scope
+                    </strong>
+
+                    <small>
+                        Follow external domains instead
+                        of only displaying them.
+                    </small>
+
+                </span>
+
+            </label>
+
+
+        </div>
+
+
+        <div class="katana-note">
+
+            Headless and Deep automatically enable
+            runtime XHR/fetch capture.
+
+            Deep additionally enables jsluice.
+
+            Secret validation is not enabled.
+
+        </div>
+
+
+        <button
+            class="button scan-button"
+            type="submit"
+        >
+            Start Katana Crawl
+        </button>
+
+
+    </form>
+
+</section>
+
+
+{% if latest %}
+
+
+<div class="stats-grid">
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Latest Run
+        </span>
+
+        <strong class="stat-value stat-small">
+            {{ latest.id }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Profile
+        </span>
+
+        <strong class="stat-value stat-small">
+            {{ latest.profile }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Unique URLs
+        </span>
+
+        <strong class="stat-value">
+            {{ latest_stats.unique_urls }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Endpoint Groups
+        </span>
+
+        <strong class="stat-value">
+            {{ latest_stats.endpoint_groups }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            XHR
+        </span>
+
+        <strong class="stat-value">
+            {{ latest_stats.xhr }}
+        </strong>
+
+    </div>
+
+
+</div>
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Latest Crawl
+            </h2>
+
+            <p class="muted">
+                {{ latest.started_at }}
+            </p>
+
+        </div>
+
+
+        <a
+            class="button"
+            href="/p/{{ project.config.project.slug }}/katana/run/{{ latest.id }}/"
+        >
+            View Results
+        </a>
+
+    </div>
+
+</section>
+
+
+{% endif %}
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Jobs
+            </h2>
+
+            <p class="muted">
+                Live Katana workers.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if jobs %}
+
+
+    <div class="table-wrap">
+
+        <table class="data-table">
+
+            <thead>
+
+            <tr>
+
+                <th>Job</th>
+                <th>Profile</th>
+                <th>Status</th>
+                <th>Targets</th>
+                <th>Results</th>
+                <th>Unique</th>
+                <th>XHR</th>
+                <th>Run</th>
+
+            </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+            {% for job in jobs %}
+
+
+            <tr
+                data-job-id="{{ job.id }}"
+                data-job-status="{{ job.status }}"
+                data-run-id="{{ job.run_id or '' }}"
+            >
+
+                <td class="mono">
+                    {{ job.id }}
+                </td>
+
+                <td class="job-profile">
+                    {{ job.profile }}
+                </td>
+
+                <td>
+
+                    <span class="run-status status-{{ job.status }}">
+                        {{ job.status }}
+                    </span>
+
+                </td>
+
+                <td class="job-targets">
+                    {{ job.target_count }}
+                </td>
+
+                <td class="job-results">
+                    {{ job.results }}
+                </td>
+
+                <td class="job-unique">
+                    {{ job.unique_urls }}
+                </td>
+
+                <td class="job-xhr">
+                    {{ job.xhr }}
+                </td>
+
+                <td class="job-run">
+
+                    {% if job.run_id %}
+
+                    <a
+                        class="table-link"
+                        href="/p/{{ project.config.project.slug }}/katana/run/{{ job.run_id }}/"
+                    >
+                        {{ job.run_id }}
+                    </a>
+
+                    {% else %}
+
+                    <span class="muted">
+                        —
+                    </span>
+
+                    {% endif %}
+
+                </td>
+
+            </tr>
+
+
+            {% endfor %}
+
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    {% else %}
+
+    <p class="muted">
+        No Katana jobs yet.
+    </p>
+
+    {% endif %}
+
+
+</section>
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Run History
+            </h2>
+
+        </div>
+
+    </div>
+
+
+    {% if runs %}
+
+
+    <div class="table-wrap">
+
+        <table class="data-table">
+
+            <thead>
+
+            <tr>
+
+                <th>Run</th>
+                <th>Profile</th>
+                <th>Status</th>
+                <th>Inputs</th>
+                <th>Results</th>
+                <th>Started</th>
+                <th></th>
+
+            </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+            {% for run in runs %}
+
+
+            <tr>
+
+                <td class="mono">
+                    {{ run.id }}
+                </td>
+
+                <td>
+                    {{ run.profile }}
+                </td>
+
+                <td>
+
+                    <span class="run-status status-{{ run.status }}">
+                        {{ run.status }}
+                    </span>
+
+                </td>
+
+                <td>
+                    {{ run.input_count }}
+                </td>
+
+                <td>
+                    {{ run.result_count }}
+                </td>
+
+                <td class="mono muted">
+                    {{ run.started_at }}
+                </td>
+
+                <td>
+
+                    <a
+                        class="table-link"
+                        href="/p/{{ project.config.project.slug }}/katana/run/{{ run.id }}/"
+                    >
+                        Open
+                    </a>
+
+                </td>
+
+            </tr>
+
+
+            {% endfor %}
+
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    {% endif %}
+
+
+</section>
+
+
+<style>
+
+.profile-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            1fr
+        );
+
+    gap: 12px;
+
+    margin-bottom: 22px;
+}
+
+
+.profile-card {
+    display: flex;
+
+    gap: 11px;
+
+    padding: 15px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.015
+        );
+}
+
+
+.profile-card:hover {
+    border-color:
+        #625487;
+}
+
+
+.profile-card input {
+    margin-top: 3px;
+}
+
+
+.profile-card span {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 6px;
+}
+
+
+.profile-card small {
+    color:
+        var(--muted);
+
+    line-height: 1.45;
+}
+
+
+.deep-profile {
+    border-color:
+        rgba(
+            190,
+            130,
+            255,
+            0.3
+        );
+}
+
+
+.katana-options {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(
+                160px,
+                1fr
+            )
+        );
+
+    gap: 16px;
+
+    margin-top: 20px;
+}
+
+
+.feature-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(
+                220px,
+                1fr
+            )
+        );
+
+    gap: 10px;
+
+    margin-top: 22px;
+}
+
+
+.feature-option {
+    display: flex;
+
+    gap: 10px;
+
+    padding: 13px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 8px;
+
+    cursor: pointer;
+}
+
+
+.feature-option span {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+}
+
+
+.feature-option small {
+    color:
+        var(--muted);
+}
+
+
+.dangerous-option {
+    border-color:
+        rgba(
+            255,
+            190,
+            80,
+            0.25
+        );
+}
+
+
+.katana-note {
+    margin-top: 18px;
+
+    padding: 12px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 8px;
+
+    color: var(--muted);
+
+    font-size: 12px;
+
+    line-height: 1.55;
+}
+
+
+@media (
+    max-width: 800px
+) {
+
+    .profile-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+}
+
+</style>
+
+
+<script>
+
+const KATANA_STATUS_URL =
+    "/p/{{ project.config.project.slug }}/katana/status.json";
+
+
+let reloadScheduled = false;
+
+
+async function refreshKatanaJobs() {
+
+    try {
+
+        const response =
+            await fetch(
+                KATANA_STATUS_URL,
+                {
+                    cache: "no-store"
+                }
+            );
+
+
+        if (!response.ok) {
+            return;
+        }
+
+
+        const data =
+            await response.json();
+
+
+        for (
+            const job
+            of data.jobs
+        ) {
+
+            const row =
+                document.querySelector(
+                    `[data-job-id="${job.id}"]`
+                );
+
+
+            if (!row) {
+                continue;
+            }
+
+
+            const previousStatus =
+                row.dataset.jobStatus
+                || "";
+
+
+            const previousRun =
+                row.dataset.runId
+                || "";
+
+
+            row.dataset.jobStatus =
+                job.status;
+
+
+            const status =
+                row.querySelector(
+                    ".run-status"
+                );
+
+
+            if (status) {
+
+                status.textContent =
+                    job.status;
+
+                status.className =
+                    `run-status status-${job.status}`;
+
+            }
+
+
+            const profile =
+                row.querySelector(
+                    ".job-profile"
+                );
+
+            if (profile) {
+                profile.textContent =
+                    job.profile;
+            }
+
+
+            const targets =
+                row.querySelector(
+                    ".job-targets"
+                );
+
+            if (targets) {
+                targets.textContent =
+                    job.target_count;
+            }
+
+
+            const results =
+                row.querySelector(
+                    ".job-results"
+                );
+
+            if (results) {
+                results.textContent =
+                    job.results;
+            }
+
+
+            const unique =
+                row.querySelector(
+                    ".job-unique"
+                );
+
+            if (unique) {
+                unique.textContent =
+                    job.unique_urls;
+            }
+
+
+            const xhr =
+                row.querySelector(
+                    ".job-xhr"
+                );
+
+            if (xhr) {
+                xhr.textContent =
+                    job.xhr;
+            }
+
+
+            if (
+                job.run_id
+                &&
+                previousRun !== job.run_id
+            ) {
+
+                row.dataset.runId =
+                    job.run_id;
+
+
+                const runCell =
+                    row.querySelector(
+                        ".job-run"
+                    );
+
+
+                if (runCell) {
+
+                    runCell.innerHTML =
+                        `<a
+                            class="table-link"
+                            href="/p/{{ project.config.project.slug }}/katana/run/${job.run_id}/"
+                        >${job.run_id}</a>`;
+
+                }
+
+            }
+
+
+            if (
+                (
+                    job.status === "completed"
+                    ||
+                    job.status === "failed"
+                )
+                &&
+                previousStatus !== job.status
+                &&
+                !reloadScheduled
+            ) {
+
+                reloadScheduled = true;
+
+                setTimeout(
+                    () => {
+                        window.location.reload();
+                    },
+                    1200
+                );
+
+            }
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Katana status refresh failed:",
+            error
+        );
+
+    }
+
+}
+
+
+refreshKatanaJobs();
+
+
+setInterval(
+    refreshKatanaJobs,
+    2000
+);
+
+</script>
+
+
+{% endblock %}

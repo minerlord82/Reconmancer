@@ -1,0 +1,1642 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Settings · {{ project.config.project.name }}
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="page-header">
+
+    <div>
+
+        <div class="eyebrow">
+            QUEST CONFIGURATION
+        </div>
+
+        <h1>
+            Settings
+        </h1>
+
+        <p class="muted">
+            Project limits, reconnaissance defaults,
+            authentication profiles and tool diagnostics.
+        </p>
+
+    </div>
+
+</div>
+
+
+{% if message %}
+
+<div class="settings-message">
+    {{ message }}
+</div>
+
+{% endif %}
+
+
+{% if error %}
+
+<div class="settings-error">
+    {{ error }}
+</div>
+
+{% endif %}
+
+
+<form
+    method="post"
+    action="/p/{{ project.config.project.slug }}/settings/save/"
+>
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Project
+            </h2>
+
+            <p class="muted">
+                Quest-level configuration.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="settings-grid">
+
+
+        <div>
+
+            <label class="form-label">
+                Storage budget
+            </label>
+
+            <div class="input-with-unit">
+
+                <input
+                    class="form-input"
+                    type="number"
+                    name="disk_limit_gb"
+                    value="{{ workspace.settings.disk_limit_gb }}"
+                    min="1"
+                    max="1000"
+                    step="0.1"
+                    required
+                >
+
+                <span>
+                    GB
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div>
+
+            <label class="form-label">
+                Default authentication context
+            </label>
+
+            <input
+                class="form-input"
+                value="anonymous"
+                disabled
+            >
+
+            <div class="form-help">
+
+                Authentication profiles are selected
+                manually per scan. Credentials are
+                never global.
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                HTTPX Defaults
+            </h2>
+
+        </div>
+
+    </div>
+
+
+    <div class="settings-grid">
+
+        <div>
+
+            <label class="form-label">
+                Rate limit
+            </label>
+
+            <input
+                class="form-input"
+                type="number"
+                name="httpx_rate_limit"
+                value="{{ workspace.settings.httpx.rate_limit }}"
+                min="1"
+                max="1000"
+            >
+
+        </div>
+
+
+        <div>
+
+            <label class="form-label">
+                Redirect depth
+            </label>
+
+            <input
+                class="form-input"
+                type="number"
+                name="httpx_redirect_depth"
+                value="{{ workspace.settings.httpx.redirect_depth }}"
+                min="0"
+                max="50"
+            >
+
+        </div>
+
+    </div>
+
+
+    <div class="settings-switches">
+
+        <label class="setting-toggle">
+
+            <input
+                type="checkbox"
+                name="httpx_screenshots"
+                value="1"
+                {% if workspace.settings.httpx.screenshots %}
+                checked
+                {% endif %}
+            >
+
+            <span>
+                <strong>Screenshots by default</strong>
+                <small>Enable visual recon automatically.</small>
+            </span>
+
+        </label>
+
+    </div>
+
+</section>
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+            <h2>Katana Defaults</h2>
+        </div>
+
+    </div>
+
+
+    <div class="settings-grid">
+
+        <div>
+
+            <label class="form-label">
+                Profile
+            </label>
+
+            <select
+                class="form-input"
+                name="katana_profile"
+            >
+
+                {% for profile in ["standard", "headless", "deep"] %}
+
+                <option
+                    value="{{ profile }}"
+                    {% if workspace.settings.katana.profile == profile %}
+                    selected
+                    {% endif %}
+                >
+                    {{ profile }}
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <div>
+
+            <label class="form-label">
+                Depth
+            </label>
+
+            <input
+                class="form-input"
+                type="number"
+                name="katana_depth"
+                value="{{ workspace.settings.katana.depth }}"
+                min="1"
+                max="10"
+            >
+
+        </div>
+
+
+        <div>
+
+            <label class="form-label">
+                Rate limit
+            </label>
+
+            <input
+                class="form-input"
+                type="number"
+                name="katana_rate_limit"
+                value="{{ workspace.settings.katana.rate_limit }}"
+                min="1"
+                max="500"
+            >
+
+        </div>
+
+
+        <div>
+
+            <label class="form-label">
+                Concurrency
+            </label>
+
+            <input
+                class="form-input"
+                type="number"
+                name="katana_concurrency"
+                value="{{ workspace.settings.katana.concurrency }}"
+                min="1"
+                max="50"
+            >
+
+        </div>
+
+
+        <div>
+
+            <label class="form-label">
+                Parallelism
+            </label>
+
+            <input
+                class="form-input"
+                type="number"
+                name="katana_parallelism"
+                value="{{ workspace.settings.katana.parallelism }}"
+                min="1"
+                max="20"
+            >
+
+        </div>
+
+
+        <div>
+
+            <label class="form-label">
+                Page load strategy
+            </label>
+
+            <select
+                class="form-input"
+                name="katana_page_load_strategy"
+            >
+
+                {% for strategy in [
+                    "heuristic",
+                    "domcontentloaded",
+                    "networkidle",
+                    "load",
+                    "none"
+                ] %}
+
+                <option
+                    value="{{ strategy }}"
+                    {% if workspace.settings.katana.page_load_strategy == strategy %}
+                    selected
+                    {% endif %}
+                >
+                    {{ strategy }}
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+    </div>
+
+
+    <div class="settings-switches">
+
+        {% for key, label in [
+            ("js_crawl", "JavaScript crawl"),
+            ("known_files", "Known files"),
+            ("form_extraction", "Form extraction"),
+            ("tech_detect", "Technology detection")
+        ] %}
+
+        <label class="setting-toggle">
+
+            <input
+                type="checkbox"
+                name="katana_{{ key }}"
+                value="1"
+                {% if workspace.settings.katana[key] %}
+                checked
+                {% endif %}
+            >
+
+            <span>
+                <strong>{{ label }}</strong>
+            </span>
+
+        </label>
+
+        {% endfor %}
+
+
+        <label class="setting-toggle">
+
+            <input
+                type="checkbox"
+                name="katana_no_scope"
+                value="1"
+                {% if workspace.settings.katana.no_scope %}
+                checked
+                {% endif %}
+            >
+
+            <span>
+
+                <strong>
+                    Disable Katana scope
+                </strong>
+
+                <small>
+                    Reconmancer itself does not
+                    silently remove discovered hosts.
+                </small>
+
+            </span>
+
+        </label>
+
+    </div>
+
+</section>
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+            <h2>Nuclei Defaults</h2>
+        </div>
+
+    </div>
+
+
+    <div class="settings-grid">
+
+        <div>
+
+            <label class="form-label">
+                Rate limit
+            </label>
+
+            <input
+                class="form-input"
+                type="number"
+                name="nuclei_rate_limit"
+                value="{{ workspace.settings.nuclei.rate_limit }}"
+                min="1"
+                max="500"
+            >
+
+        </div>
+
+
+        <div>
+
+            <label class="form-label">
+                Concurrency
+            </label>
+
+            <input
+                class="form-input"
+                type="number"
+                name="nuclei_concurrency"
+                value="{{ workspace.settings.nuclei.concurrency }}"
+                min="1"
+                max="50"
+            >
+
+        </div>
+
+
+        <div>
+
+            <label class="form-label">
+                Bulk size
+            </label>
+
+            <input
+                class="form-input"
+                type="number"
+                name="nuclei_bulk_size"
+                value="{{ workspace.settings.nuclei.bulk_size }}"
+                min="1"
+                max="50"
+            >
+
+        </div>
+
+
+        <div>
+
+            <label class="form-label">
+                Template tags
+            </label>
+
+            <input
+                class="form-input"
+                type="text"
+                name="nuclei_tags"
+                value="{{ workspace.settings.nuclei.tags }}"
+            >
+
+        </div>
+
+
+        <div>
+
+            <label class="form-label">
+                Excluded tags
+            </label>
+
+            <input
+                class="form-input"
+                type="text"
+                name="nuclei_exclude_tags"
+                value="{{ workspace.settings.nuclei.exclude_tags }}"
+            >
+
+        </div>
+
+    </div>
+
+
+    <div class="severity-options">
+
+        {% for severity in [
+            "critical",
+            "high",
+            "medium",
+            "low",
+            "info"
+        ] %}
+
+        <label>
+
+            <input
+                type="checkbox"
+                name="nuclei_severity"
+                value="{{ severity }}"
+                {% if severity in workspace.settings.nuclei.severities %}
+                checked
+                {% endif %}
+            >
+
+            {{ severity|capitalize }}
+
+        </label>
+
+        {% endfor %}
+
+    </div>
+
+
+    <div class="settings-switches">
+
+        <label class="setting-toggle">
+
+            <input
+                type="checkbox"
+                name="nuclei_no_interactsh"
+                value="1"
+                {% if workspace.settings.nuclei.no_interactsh %}
+                checked
+                {% endif %}
+            >
+
+            <span>
+                <strong>Disable Interactsh</strong>
+            </span>
+
+        </label>
+
+
+        <label class="setting-toggle">
+
+            <input
+                type="checkbox"
+                name="nuclei_allow_headless"
+                value="1"
+                {% if workspace.settings.nuclei.allow_headless %}
+                checked
+                {% endif %}
+            >
+
+            <span>
+                <strong>Allow headless templates</strong>
+            </span>
+
+        </label>
+
+    </div>
+
+</section>
+
+
+<section class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h2>Long-Term Storage Compression</h2>
+            <p class="muted">
+                Optional. Compress older raw JSONL and job logs after scans.
+                Normalized SQLite data and evidence objects stay directly usable.
+            </p>
+        </div>
+    </div>
+
+    <div class="settings-switches">
+        <label class="setting-toggle">
+            <input
+                type="checkbox"
+                name="compression_enabled"
+                value="1"
+                {% if workspace.settings.compression.enabled %}checked{% endif %}
+            >
+            <span>
+                <strong>Enable automatic compression</strong>
+                <small>Disabled by default. Runs after worker completion.</small>
+            </span>
+        </label>
+    </div>
+
+    <div class="settings-grid">
+        <div>
+            <label class="form-label">Algorithm</label>
+            <select class="form-input" name="compression_algorithm">
+                <option
+                    value="zstd"
+                    {% if workspace.settings.compression.algorithm == 'zstd' %}selected{% endif %}
+                >
+                    zstd{% if not workspace.compression_capabilities.zstd %} (not installed){% endif %}
+                </option>
+                <option
+                    value="gzip"
+                    {% if workspace.settings.compression.algorithm == 'gzip' %}selected{% endif %}
+                >gzip</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="form-label">Minimum age</label>
+            <div class="input-with-unit">
+                <input
+                    class="form-input"
+                    type="number"
+                    step="0.5"
+                    min="0"
+                    max="3650"
+                    name="compression_minimum_age_days"
+                    value="{{ workspace.settings.compression.minimum_age_days }}"
+                >
+                <span>days</span>
+            </div>
+        </div>
+
+        <div>
+            <label class="form-label">Minimum file size</label>
+            <div class="input-with-unit">
+                <input
+                    class="form-input"
+                    type="number"
+                    step="0.25"
+                    min="0"
+                    max="10240"
+                    name="compression_minimum_size_mb"
+                    value="{{ workspace.settings.compression.minimum_size_mb }}"
+                >
+                <span>MB</span>
+            </div>
+        </div>
+
+        <div>
+            <label class="form-label">Files per maintenance pass</label>
+            <input
+                class="form-input"
+                type="number"
+                min="1"
+                max="10000"
+                name="compression_max_files_per_pass"
+                value="{{ workspace.settings.compression.max_files_per_pass }}"
+            >
+        </div>
+    </div>
+
+    <div class="form-help">
+        zstd availability: {{ 'available' if workspace.compression_capabilities.zstd else 'not installed' }}.
+        gzip is always available through Python.
+    </div>
+
+</section>
+
+<div class="settings-actions">
+
+    <button
+        class="button scan-button"
+        type="submit"
+    >
+        Save Project Settings
+    </button>
+
+</div>
+
+
+</form>
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Nuclei Templates
+            </h2>
+
+            <p class="muted">
+                Reconmancer manually manages the official
+                ProjectDiscovery nuclei-templates repository.
+                Template updates happen only when you click the button below.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="settings-grid">
+
+        <div>
+
+            <label class="form-label">
+                Template source
+            </label>
+
+            <input
+                class="form-input"
+                value="nuclei-templates (ProjectDiscovery)"
+                disabled
+            >
+
+        </div>
+
+
+        <div>
+
+            <label class="form-label">
+                Installed version
+            </label>
+
+            <input
+                class="form-input mono"
+                value="{{ workspace.nuclei_templates.version }}"
+                disabled
+            >
+
+            <div class="form-help">
+                {% if workspace.nuclei_templates.installed %}
+                Branch {{ workspace.nuclei_templates.branch }} · {{ workspace.nuclei_templates.path }}
+                {% else %}
+                Not installed yet. Click Update Nuclei Templates to clone the official repository.
+                {% endif %}
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <form
+        method="post"
+        action="/p/{{ project.config.project.slug }}/settings/nuclei-templates/update/"
+    >
+
+        <button
+            class="button secondary"
+            type="submit"
+        >
+            Update Nuclei Templates
+        </button>
+
+    </form>
+
+
+    <div class="form-help">
+        Manual only. Reconmancer refuses to modify the repository while a Nuclei job is queued or running.
+    </div>
+
+</section>
+
+<section class="panel">
+    <div class="panel-header">
+        <div>
+            <h2>Compression Maintenance</h2>
+            <p class="muted">Run one maintenance pass immediately using the saved compression settings.</p>
+        </div>
+    </div>
+    <form method="post" action="/p/{{ project.config.project.slug }}/settings/compress-now/">
+        <button class="button secondary" type="submit">Compress Eligible Files Now</button>
+    </form>
+</section>
+
+
+<section class="panel auth-panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Authentication Profiles
+            </h2>
+
+            <p class="muted">
+
+                Manually configured credentials bound
+                to exact hosts.
+
+                Secret values are not displayed after
+                the profile is saved.
+
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="auth-warning">
+
+        Credentials only become eligible for a request
+        when the request hostname exactly matches one
+        of the profile's stored hosts.
+
+        <strong>
+            example.com does not automatically authorize
+            api.example.com.
+        </strong>
+
+    </div>
+
+
+    <form
+        method="post"
+        action="/p/{{ project.config.project.slug }}/settings/auth/create/"
+        class="auth-create-form"
+        autocomplete="off"
+    >
+
+
+        <div class="settings-grid">
+
+            <div>
+
+                <label class="form-label">
+                    Profile name
+                </label>
+
+                <input
+                    class="form-input"
+                    type="text"
+                    name="name"
+                    maxlength="100"
+                    placeholder="Shop admin account"
+                    required
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="auth-form-grid">
+
+
+            <div>
+
+                <label class="form-label">
+                    Exact allowed hosts
+                </label>
+
+                <textarea
+                    class="target-input"
+                    name="domains"
+                    rows="7"
+                    placeholder="admin.example.com&#10;api.example.com"
+                    required
+                ></textarea>
+
+                <div class="form-help">
+
+                    One exact hostname per line.
+                    URLs are accepted and reduced
+                    to their hostname.
+
+                    Wildcards are rejected.
+
+                </div>
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Custom headers
+                </label>
+
+                <textarea
+                    class="target-input"
+                    name="headers"
+                    rows="7"
+                    placeholder="Authorization: Bearer ...&#10;X-API-Key: ..."
+                ></textarea>
+
+                <div class="form-help">
+
+                    One header per line.
+                    Host, Content-Length and other
+                    transport-controlled headers
+                    cannot be stored.
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <label class="form-label auth-field">
+            Cookie header value
+        </label>
+
+        <textarea
+            class="target-input"
+            name="cookie"
+            rows="4"
+            placeholder="session=...; csrf=..."
+        ></textarea>
+
+
+        <label class="form-label auth-field">
+            Notes
+        </label>
+
+        <textarea
+            class="target-input"
+            name="notes"
+            rows="3"
+            placeholder="Optional non-secret notes"
+        ></textarea>
+
+
+        <button
+            class="button scan-button"
+            type="submit"
+        >
+            Create Authentication Profile
+        </button>
+
+    </form>
+
+
+    {% if auth_profiles %}
+
+
+    <div class="auth-profile-list">
+
+        {% for profile in auth_profiles %}
+
+
+        <div class="auth-profile-card">
+
+
+            <div class="auth-profile-header">
+
+                <div>
+
+                    <div class="auth-profile-name">
+                        {{ profile.name }}
+                    </div>
+
+                    <div class="mono muted">
+                        {{ profile.id }}
+                    </div>
+
+                </div>
+
+
+                <div class="auth-profile-state">
+                    MANUAL
+                </div>
+
+            </div>
+
+
+            <div class="auth-profile-stats">
+
+                <span>
+                    {{ profile.host_count }}
+                    exact host(s)
+                </span>
+
+                <span>
+                    {{ profile.header_count }}
+                    secret header(s)
+                </span>
+
+                <span>
+
+                    {% if profile.has_cookie %}
+                        cookie stored
+                    {% else %}
+                        no cookie
+                    {% endif %}
+
+                </span>
+
+            </div>
+
+
+            <div class="auth-hosts">
+
+                {% for host in profile.hosts %}
+
+                <span class="auth-host">
+                    {{ host }}
+                </span>
+
+                {% endfor %}
+
+            </div>
+
+
+            {% if profile.header_names %}
+
+            <div class="auth-secret-summary">
+
+                Header names:
+
+                {% for header in profile.header_names %}
+
+                    <span class="mono">
+                        {{ header }}
+                    </span>
+
+                    {% if not loop.last %}
+                        ·
+                    {% endif %}
+
+                {% endfor %}
+
+            </div>
+
+            {% endif %}
+
+
+            {% if profile.notes %}
+
+            <div class="auth-notes">
+                {{ profile.notes }}
+            </div>
+
+            {% endif %}
+
+
+            <form
+                method="post"
+                action="/p/{{ project.config.project.slug }}/settings/auth/{{ profile.id }}/delete/"
+                class="auth-delete-form"
+            >
+
+                <label class="form-label">
+
+                    Type
+                    <strong>{{ profile.id }}</strong>
+                    to delete
+
+                </label>
+
+                <div class="delete-row">
+
+                    <input
+                        class="form-input"
+                        type="text"
+                        name="confirm"
+                        autocomplete="off"
+                        required
+                    >
+
+                    <button
+                        class="button danger-outline"
+                        type="submit"
+                    >
+                        Delete
+                    </button>
+
+                </div>
+
+            </form>
+
+
+        </div>
+
+
+        {% endfor %}
+
+    </div>
+
+
+    {% else %}
+
+    <div class="empty-auth">
+
+        No authentication profiles configured.
+
+        All reconnaissance remains anonymous.
+
+    </div>
+
+    {% endif %}
+
+
+</section>
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Installed Tools
+            </h2>
+
+            <p class="muted">
+                Versions are read directly from the configured ProjectDiscovery binaries.
+                Updates are manual and use PDTM.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="table-wrap">
+
+        <table class="data-table">
+
+            <thead>
+
+            <tr>
+
+                <th>Tool</th>
+                <th>Status</th>
+                <th>Version</th>
+                <th>Path</th>
+                <th>Update</th>
+
+            </tr>
+
+            </thead>
+
+
+            <tbody>
+
+            {% for tool in workspace.tools %}
+
+            <tr>
+
+                <td>
+                    <strong>{{ tool.name|upper }}</strong>
+                </td>
+
+                <td>
+
+                    {% if tool.executable %}
+
+                    <span class="tool-ready">
+                        READY
+                    </span>
+
+                    {% elif tool.exists %}
+
+                    <span class="tool-warning">
+                        NOT EXECUTABLE
+                    </span>
+
+                    {% else %}
+
+                    <span class="tool-error">
+                        MISSING
+                    </span>
+
+                    {% endif %}
+
+                </td>
+
+                <td class="mono">
+                    {{ tool.version }}
+                </td>
+
+                <td class="mono tool-path">
+                    {{ tool.path }}
+                </td>
+
+                <td>
+
+                    {% if tool.can_update %}
+
+                    <form
+                        method="post"
+                        action="{{ url_for(
+                            'settings_workspace.settings_update_tool',
+                            slug=project.config.project.slug,
+                            tool_name=tool.name
+                        ) }}"
+                    >
+
+                        <button
+                            class="button secondary"
+                            type="submit"
+                        >
+                            Update
+                        </button>
+
+                    </form>
+
+                    {% else %}
+
+                    <span
+                        class="muted"
+                        title="{{ tool.update_reason or 'Update unavailable' }}"
+                    >
+                        Unavailable
+                    </span>
+
+                    {% endif %}
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <div class="form-help">
+        Reconmancer refuses to update a tool while that engine has a queued or running job.
+    </div>
+
+</section>
+
+
+<style>
+
+.settings-message,
+.settings-error,
+.auth-warning {
+    margin-bottom: 18px;
+
+    padding: 12px 14px;
+
+    border-radius: 8px;
+
+    font-size: 12px;
+
+    line-height: 1.55;
+}
+
+
+.settings-message {
+    border:
+        1px solid rgba(80, 220, 150, .25);
+
+    background:
+        rgba(80, 220, 150, .06);
+
+    color:
+        #8fe1b4;
+}
+
+
+.settings-error {
+    border:
+        1px solid rgba(255, 80, 100, .28);
+
+    background:
+        rgba(255, 80, 100, .06);
+
+    color:
+        #ff9aa8;
+}
+
+
+.settings-grid,
+.auth-form-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(220px, 1fr)
+        );
+
+    gap: 16px;
+}
+
+
+.input-with-unit {
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+}
+
+
+.input-with-unit .form-input {
+    flex: 1;
+}
+
+
+.settings-switches {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(230px, 1fr)
+        );
+
+    gap: 10px;
+
+    margin-top: 20px;
+}
+
+
+.setting-toggle {
+    display: flex;
+
+    gap: 10px;
+
+    padding: 13px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 8px;
+}
+
+
+.setting-toggle span {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+}
+
+
+.setting-toggle small {
+    color: var(--muted);
+}
+
+
+.severity-options {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 14px;
+
+    margin-top: 20px;
+}
+
+
+.severity-options label {
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    font-size: 12px;
+}
+
+
+.settings-actions {
+    display: flex;
+
+    justify-content: flex-end;
+
+    margin:
+        18px 0 28px;
+}
+
+
+.auth-panel {
+    border-color:
+        rgba(152, 119, 255, .28);
+}
+
+
+.auth-warning {
+    border:
+        1px solid rgba(255, 190, 70, .2);
+
+    background:
+        rgba(255, 190, 70, .05);
+
+    color:
+        #d8c89d;
+}
+
+
+.auth-create-form {
+    padding-top: 8px;
+}
+
+
+.auth-form-grid {
+    margin-top: 18px;
+}
+
+
+.auth-field {
+    margin-top: 18px;
+}
+
+
+.auth-profile-list {
+    display: grid;
+
+    gap: 12px;
+
+    margin-top: 28px;
+}
+
+
+.auth-profile-card {
+    padding: 16px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 9px;
+
+    background:
+        rgba(255, 255, 255, .015);
+}
+
+
+.auth-profile-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    gap: 14px;
+}
+
+
+.auth-profile-name {
+    margin-bottom: 5px;
+
+    font-weight: 700;
+}
+
+
+.auth-profile-state {
+    height: fit-content;
+
+    padding:
+        4px 6px;
+
+    border-radius: 5px;
+
+    background:
+        rgba(152, 119, 255, .12);
+
+    color:
+        #c5b6ff;
+
+    font-size: 9px;
+
+    font-weight: 800;
+}
+
+
+.auth-profile-stats {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 8px 18px;
+
+    margin-top: 13px;
+
+    color: var(--muted);
+
+    font-size: 11px;
+}
+
+
+.auth-hosts {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 6px;
+
+    margin-top: 12px;
+}
+
+
+.auth-host {
+    padding:
+        4px 6px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 5px;
+
+    font-family:
+        "SFMono-Regular",
+        Consolas,
+        monospace;
+
+    font-size: 10px;
+}
+
+
+.auth-secret-summary,
+.auth-notes {
+    margin-top: 12px;
+
+    color: var(--muted);
+
+    font-size: 11px;
+
+    line-height: 1.5;
+}
+
+
+.auth-delete-form {
+    max-width: 620px;
+
+    margin-top: 18px;
+}
+
+
+.delete-row {
+    display: grid;
+
+    grid-template-columns:
+        1fr auto;
+
+    gap: 8px;
+}
+
+
+.danger-outline {
+    border-color:
+        rgba(255, 80, 100, .3);
+
+    color:
+        #ff9aa8;
+}
+
+
+.empty-auth {
+    margin-top: 22px;
+
+    color: var(--muted);
+
+    font-size: 12px;
+}
+
+
+.tool-ready,
+.tool-warning,
+.tool-error {
+    display: inline-block;
+
+    padding:
+        4px 6px;
+
+    border-radius: 5px;
+
+    font-size: 9px;
+
+    font-weight: 800;
+}
+
+
+.tool-ready {
+    background:
+        rgba(80, 220, 150, .11);
+
+    color:
+        #8fe1b4;
+}
+
+
+.tool-warning {
+    background:
+        rgba(255, 190, 70, .11);
+
+    color:
+        #ffd180;
+}
+
+
+.tool-error {
+    background:
+        rgba(255, 80, 100, .11);
+
+    color:
+        #ff9aa8;
+}
+
+
+.tool-path {
+    overflow-wrap: anywhere;
+
+    font-size: 10px;
+}
+
+</style>
+
+
+{% endblock %}

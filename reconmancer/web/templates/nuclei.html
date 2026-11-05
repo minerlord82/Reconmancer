@@ -1,0 +1,928 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Nuclei · {{ project.config.project.name }}
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="page-header">
+
+    <div>
+
+        <div class="eyebrow">
+            NUCLEI ENGINE
+        </div>
+
+        <h1>
+            Nuclei
+        </h1>
+
+        <p class="muted">
+            Template-driven vulnerability,
+            exposure and misconfiguration detection.
+        </p>
+
+    </div>
+
+
+    <div class="status-pill">
+        Web-safe baseline
+    </div>
+
+</div>
+
+
+<section class="panel scan-panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                New Nuclei Scan
+            </h2>
+
+            <p class="muted">
+                Manual standalone scan.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <form
+        method="post"
+        enctype="multipart/form-data"
+        action="/p/{{ project.config.project.slug }}/nuclei/new/"
+    >
+
+
+        <div class="upload-zone">
+
+            <label class="form-label">
+                Upload targets.txt
+            </label>
+
+            <input
+                class="file-input"
+                type="file"
+                name="targets_file"
+                accept=".txt,text/plain"
+            >
+
+        </div>
+
+
+        <div class="input-separator">
+            <span>OR</span>
+        </div>
+
+
+        <label class="form-label">
+            Paste Targets
+        </label>
+
+        <textarea
+            class="target-input"
+            name="targets"
+            rows="6"
+            placeholder="https://example.com&#10;https://api.example.com"
+        ></textarea>
+
+
+        <div class="nuclei-options">
+
+            <div>
+
+                <label class="form-label">
+                    Template source
+                </label>
+
+                <select
+                    class="form-input"
+                    name="template_source"
+                >
+                    <option value="default" selected>
+                        Default Nuclei
+                    </option>
+                    <option value="projectdiscovery">
+                        nuclei-templates (ProjectDiscovery)
+                    </option>
+                </select>
+
+                <div class="form-help">
+                    ProjectDiscovery templates are installed and updated manually from Settings.
+                </div>
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Rate limit
+                </label>
+
+                <input
+                    class="form-input"
+                    type="number"
+                    name="rate_limit"
+                    value="10"
+                    min="1"
+                    max="500"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Concurrency
+                </label>
+
+                <input
+                    class="form-input"
+                    type="number"
+                    name="concurrency"
+                    value="5"
+                    min="1"
+                    max="50"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Bulk size
+                </label>
+
+                <input
+                    class="form-input"
+                    type="number"
+                    name="bulk_size"
+                    value="5"
+                    min="1"
+                    max="50"
+                >
+
+            </div>
+
+        </div>
+
+
+        <label class="form-label severity-heading">
+            Severities
+        </label>
+
+
+        <div class="severity-options">
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="severity"
+                    value="critical"
+                    checked
+                >
+                Critical
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="severity"
+                    value="high"
+                    checked
+                >
+                High
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="severity"
+                    value="medium"
+                    checked
+                >
+                Medium
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="severity"
+                    value="low"
+                    checked
+                >
+                Low
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="severity"
+                    value="info"
+                    checked
+                >
+                Info
+            </label>
+
+        </div>
+
+
+        <div class="nuclei-text-options">
+
+            <div>
+
+                <label class="form-label">
+                    Template tags
+                </label>
+
+                <input
+                    class="form-input"
+                    type="text"
+                    name="tags"
+                    placeholder="Optional"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Excluded tags
+                </label>
+
+                <input
+                    class="form-input"
+                    type="text"
+                    name="exclude_tags"
+                    value="dos,fuzz,bruteforce"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="feature-grid">
+
+            <label class="feature-option">
+
+                <input
+                    type="checkbox"
+                    name="no_interactsh"
+                    value="1"
+                    checked
+                >
+
+                <span>
+
+                    <strong>
+                        Disable Interactsh
+                    </strong>
+
+                    <small>
+                        Default baseline behavior.
+                    </small>
+
+                </span>
+
+            </label>
+
+
+            <label class="feature-option">
+
+                <input
+                    type="checkbox"
+                    name="allow_headless"
+                    value="1"
+                >
+
+                <span>
+
+                    <strong>
+                        Allow headless templates
+                    </strong>
+
+                    <small>
+                        Uses more RAM.
+                    </small>
+
+                </span>
+
+            </label>
+
+        </div>
+
+
+        <button
+            class="button scan-button"
+            type="submit"
+        >
+            Start Nuclei Scan
+        </button>
+
+    </form>
+
+</section>
+
+
+{% if latest %}
+
+<div class="stats-grid">
+
+    <div class="stat-card">
+        <span class="stat-label">Latest Run</span>
+        <strong class="stat-value stat-small">{{ latest.id }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span class="stat-label">Findings</span>
+        <strong class="stat-value">{{ latest_stats.total }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span class="stat-label">Critical</span>
+        <strong class="stat-value">{{ latest_stats.critical }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span class="stat-label">High</span>
+        <strong class="stat-value">{{ latest_stats.high }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span class="stat-label">Medium</span>
+        <strong class="stat-value">{{ latest_stats.medium }}</strong>
+    </div>
+
+</div>
+
+{% endif %}
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Jobs
+            </h2>
+
+            <p class="muted">
+                Manual and handoff-created Nuclei jobs.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if jobs %}
+
+    <div class="table-wrap">
+
+        <table class="data-table">
+
+            <thead>
+
+            <tr>
+                <th>Job</th>
+                <th>Source</th>
+                <th>Status</th>
+                <th>Targets</th>
+                <th>Findings</th>
+                <th>Critical</th>
+                <th>High</th>
+                <th>Run</th>
+            </tr>
+
+            </thead>
+
+
+            <tbody>
+
+            {% for job in jobs %}
+
+            <tr
+                data-job-id="{{ job.id }}"
+                data-job-status="{{ job.status }}"
+                data-run-id="{{ job.run_id or '' }}"
+            >
+
+                <td class="mono">
+                    {{ job.id }}
+                </td>
+
+
+                <td class="job-source">
+
+                    {% if job.source_engine and job.source_run_id %}
+
+                    <span class="source-badge">
+                        {{ job.source_engine|upper }}
+                    </span>
+
+                    <span class="mono">
+                        {{ job.source_run_id }}
+                    </span>
+
+                    {% else %}
+
+                    <span class="muted">
+                        Manual
+                    </span>
+
+                    {% endif %}
+
+                </td>
+
+
+                <td>
+
+                    <span class="run-status status-{{ job.status }}">
+                        {{ job.status }}
+                    </span>
+
+                </td>
+
+
+                <td class="job-targets">
+                    {{ job.target_count }}
+                </td>
+
+
+                <td class="job-findings">
+                    {{ job.findings }}
+                </td>
+
+
+                <td class="job-critical">
+                    {{ job.critical }}
+                </td>
+
+
+                <td class="job-high">
+                    {{ job.high }}
+                </td>
+
+
+                <td class="job-run">
+
+                    {% if job.run_id %}
+
+                    <a
+                        class="table-link"
+                        href="/p/{{ project.config.project.slug }}/nuclei/run/{{ job.run_id }}/"
+                    >
+                        {{ job.run_id }}
+                    </a>
+
+                    {% else %}
+
+                        —
+
+                    {% endif %}
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {% else %}
+
+    <p class="muted">
+        No Nuclei jobs yet.
+    </p>
+
+    {% endif %}
+
+</section>
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+            <h2>Run History</h2>
+        </div>
+
+    </div>
+
+
+    {% if runs %}
+
+    <div class="table-wrap">
+
+        <table class="data-table">
+
+            <thead>
+
+            <tr>
+                <th>Run</th>
+                <th>Status</th>
+                <th>Inputs</th>
+                <th>Findings</th>
+                <th>Started</th>
+                <th></th>
+            </tr>
+
+            </thead>
+
+
+            <tbody>
+
+            {% for run in runs %}
+
+            <tr>
+
+                <td class="mono">
+                    {{ run.id }}
+                </td>
+
+                <td>
+
+                    <span class="run-status status-{{ run.status }}">
+                        {{ run.status }}
+                    </span>
+
+                </td>
+
+                <td>
+                    {{ run.input_count }}
+                </td>
+
+                <td>
+                    {{ run.result_count }}
+                </td>
+
+                <td class="mono muted">
+                    {{ run.started_at }}
+                </td>
+
+                <td>
+
+                    <a
+                        class="table-link"
+                        href="/p/{{ project.config.project.slug }}/nuclei/run/{{ run.id }}/"
+                    >
+                        Open
+                    </a>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {% endif %}
+
+</section>
+
+
+<style>
+
+.nuclei-options,
+.nuclei-text-options {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(180px, 1fr)
+        );
+
+    gap: 16px;
+
+    margin-top: 20px;
+}
+
+
+.severity-heading {
+    margin-top: 22px;
+}
+
+
+.severity-options {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 14px;
+}
+
+
+.severity-options label {
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    font-size: 12px;
+}
+
+
+.feature-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(230px, 1fr)
+        );
+
+    gap: 10px;
+
+    margin-top: 22px;
+}
+
+
+.feature-option {
+    display: flex;
+
+    gap: 10px;
+
+    padding: 13px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 8px;
+}
+
+
+.feature-option span {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+}
+
+
+.feature-option small {
+    color: var(--muted);
+}
+
+
+.source-badge {
+    margin-right: 5px;
+
+    padding:
+        3px 5px;
+
+    border-radius: 5px;
+
+    background:
+        rgba(152, 119, 255, 0.13);
+
+    color:
+        #c5b6ff;
+
+    font-size: 9px;
+
+    font-weight: 800;
+}
+
+</style>
+
+
+<script>
+
+const NUCLEI_STATUS_URL =
+    "/p/{{ project.config.project.slug }}/nuclei/status.json";
+
+
+let reloadScheduled = false;
+
+
+async function refreshNucleiJobs() {
+
+    try {
+
+        const response =
+            await fetch(
+                NUCLEI_STATUS_URL,
+                {
+                    cache: "no-store"
+                }
+            );
+
+
+        if (!response.ok) {
+            return;
+        }
+
+
+        const data =
+            await response.json();
+
+
+        for (
+            const job
+            of data.jobs
+        ) {
+
+            const row =
+                document.querySelector(
+                    `[data-job-id="${job.id}"]`
+                );
+
+
+            if (!row) {
+                continue;
+            }
+
+
+            const oldStatus =
+                row.dataset.jobStatus
+                || "";
+
+
+            const oldRun =
+                row.dataset.runId
+                || "";
+
+
+            row.dataset.jobStatus =
+                job.status;
+
+
+            const status =
+                row.querySelector(
+                    ".run-status"
+                );
+
+
+            if (status) {
+
+                status.textContent =
+                    job.status;
+
+                status.className =
+                    `run-status status-${job.status}`;
+
+            }
+
+
+            const targets =
+                row.querySelector(
+                    ".job-targets"
+                );
+
+
+            if (targets) {
+
+                targets.textContent =
+                    job.target_count;
+
+            }
+
+
+            const findings =
+                row.querySelector(
+                    ".job-findings"
+                );
+
+
+            if (findings) {
+
+                findings.textContent =
+                    job.findings;
+
+            }
+
+
+            const critical =
+                row.querySelector(
+                    ".job-critical"
+                );
+
+
+            if (critical) {
+
+                critical.textContent =
+                    job.critical;
+
+            }
+
+
+            const high =
+                row.querySelector(
+                    ".job-high"
+                );
+
+
+            if (high) {
+
+                high.textContent =
+                    job.high;
+
+            }
+
+
+            if (
+                job.run_id
+                &&
+                oldRun !== job.run_id
+            ) {
+
+                row.dataset.runId =
+                    job.run_id;
+
+
+                const runCell =
+                    row.querySelector(
+                        ".job-run"
+                    );
+
+
+                if (runCell) {
+
+                    runCell.innerHTML =
+                        `<a
+                            class="table-link"
+                            href="/p/{{ project.config.project.slug }}/nuclei/run/${job.run_id}/"
+                        >${job.run_id}</a>`;
+
+                }
+
+            }
+
+
+            if (
+                (
+                    job.status === "completed"
+                    ||
+                    job.status === "failed"
+                )
+                &&
+                oldStatus !== job.status
+                &&
+                !reloadScheduled
+            ) {
+
+                reloadScheduled = true;
+
+                setTimeout(
+                    () => {
+                        window.location.reload();
+                    },
+                    1200
+                );
+
+            }
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Nuclei status refresh failed:",
+            error
+        );
+
+    }
+
+}
+
+
+refreshNucleiJobs();
+
+
+setInterval(
+    refreshNucleiJobs,
+    2000
+);
+
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,566 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Cleanup Preview · Reconmancer
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="page-header">
+
+    <div>
+
+        <div class="eyebrow">
+            STORAGE CLEANUP
+        </div>
+
+        <h1>
+            Cleanup Preview
+        </h1>
+
+        <p class="muted">
+            Review exactly what will be removed.
+        </p>
+
+    </div>
+
+
+    <a
+        class="button secondary"
+        href="/p/{{ project.config.project.slug }}/storage/"
+    >
+        Cancel
+    </a>
+
+</div>
+
+
+{% if cleanup_type == "run" %}
+
+
+<section class="panel danger-panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Delete Run {{ run_id }}
+            </h2>
+
+            <p class="muted">
+                Engine:
+                {{ preview.run.engine|upper }}
+                ·
+                status:
+                {{ preview.run.status }}
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+
+            <span class="stat-label">
+                DB Rows
+            </span>
+
+            <strong class="stat-value">
+                {{ preview.database_row_total }}
+            </strong>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <span class="stat-label">
+                Raw Files
+            </span>
+
+            <strong class="stat-value">
+                {{ preview.raw_files }}
+            </strong>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <span class="stat-label">
+                Raw Size
+            </span>
+
+            <strong class="stat-value stat-small">
+                {{ preview.raw_bytes|human_bytes }}
+            </strong>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <span class="stat-label">
+                Exclusive Artifacts
+            </span>
+
+            <strong class="stat-value">
+                {{ preview.exclusive_artifacts|length }}
+            </strong>
+
+        </div>
+
+
+    </div>
+
+
+    {% if preview.database_rows %}
+
+    <h3>
+        Database rows
+    </h3>
+
+    <div class="table-wrap">
+
+        <table class="data-table">
+
+            <thead>
+
+            <tr>
+                <th>Table</th>
+                <th>Rows</th>
+            </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for item in preview.database_rows %}
+
+            <tr>
+
+                <td class="mono">
+                    {{ item.table }}
+                </td>
+
+                <td>
+                    {{ item.rows }}
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {% endif %}
+
+
+    {% if preview.linked_jobs %}
+
+    <div class="cleanup-note">
+
+        {{ preview.linked_jobs|length }}
+        job record(s) currently point to this run.
+
+        Their history is preserved, but their
+        run_id link will be cleared.
+
+    </div>
+
+    {% endif %}
+
+
+    {% if preview.exclusive_artifacts %}
+
+    <div class="cleanup-note">
+
+        Screenshot artifacts shown here are deleted
+        only when this run is their final remaining
+        database reference.
+
+    </div>
+
+    {% endif %}
+
+
+    <form
+        method="post"
+        action="/p/{{ project.config.project.slug }}/storage/run/{{ run_id }}/delete/"
+        class="confirm-form"
+    >
+
+        <label class="form-label">
+
+            Type
+            <strong>{{ run_id }}</strong>
+            to confirm
+
+        </label>
+
+        <input
+            class="form-input"
+            type="text"
+            name="confirm"
+            autocomplete="off"
+            required
+        >
+
+        <button
+            class="button destructive-button"
+            type="submit"
+        >
+            Permanently Delete Run
+        </button>
+
+    </form>
+
+</section>
+
+
+{% elif cleanup_type == "artifact" %}
+
+
+<section class="panel danger-panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Delete Artifact
+            </h2>
+
+            <p class="mono muted">
+                {{ artifact.hash }}
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+
+            <span class="stat-label">
+                Kind
+            </span>
+
+            <strong class="stat-value stat-small">
+                {{ artifact.kind }}
+            </strong>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <span class="stat-label">
+                Size
+            </span>
+
+            <strong class="stat-value stat-small">
+                {{ (artifact.size_bytes or 0)|human_bytes }}
+            </strong>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <span class="stat-label">
+                References
+            </span>
+
+            <strong class="stat-value">
+                {{ artifact.references }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    {% if artifact.deletable %}
+
+    <div class="cleanup-note">
+
+        Reconmancer found zero references to this
+        object in all database columns ending in
+        <span class="mono">_hash</span>.
+
+    </div>
+
+
+    <form
+        method="post"
+        action="/p/{{ project.config.project.slug }}/storage/artifact/{{ artifact.hash }}/delete/"
+        class="confirm-form"
+    >
+
+        <label class="form-label">
+            Type the complete artifact hash to confirm
+        </label>
+
+        <input
+            class="form-input"
+            type="text"
+            name="confirm"
+            autocomplete="off"
+            required
+        >
+
+        <button
+            class="button destructive-button"
+            type="submit"
+        >
+            Permanently Delete Artifact
+        </button>
+
+    </form>
+
+
+    {% else %}
+
+    <div class="cleanup-blocked">
+
+        This artifact is still referenced and
+        Reconmancer will not delete it.
+
+    </div>
+
+    {% endif %}
+
+</section>
+
+
+{% elif cleanup_type == "maintenance" %}
+
+
+<section class="panel danger-panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                {{ maintenance.label }}
+            </h2>
+
+            <p class="muted">
+                Maintenance cleanup preview
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+
+            <span class="stat-label">
+                Files
+            </span>
+
+            <strong class="stat-value">
+                {{ maintenance.files }}
+            </strong>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <span class="stat-label">
+                Size
+            </span>
+
+            <strong class="stat-value stat-small">
+                {{ maintenance.bytes|human_bytes }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    {% if maintenance.entries %}
+
+    <div class="table-wrap maintenance-preview-table">
+
+        <table class="data-table">
+
+            <thead>
+
+            <tr>
+
+                <th>Path</th>
+                <th>Files</th>
+                <th>Size</th>
+
+            </tr>
+
+            </thead>
+
+
+            <tbody>
+
+            {% for item in maintenance.entries %}
+
+            <tr>
+
+                <td class="mono">
+                    {{ item.path }}
+                </td>
+
+                <td>
+                    {{ item.files }}
+                </td>
+
+                <td class="mono">
+                    {{ item.bytes|human_bytes }}
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <form
+        method="post"
+        action="/p/{{ project.config.project.slug }}/storage/maintenance/{{ maintenance.kind }}/execute/"
+        class="confirm-form"
+    >
+
+        <label class="form-label">
+            Type <strong>CLEAN</strong> to confirm
+        </label>
+
+        <input
+            class="form-input"
+            type="text"
+            name="confirm"
+            autocomplete="off"
+            required
+        >
+
+        <button
+            class="button destructive-button"
+            type="submit"
+        >
+            Execute Cleanup
+        </button>
+
+    </form>
+
+
+    {% else %}
+
+    <div class="cleanup-note">
+        Nothing currently matches this cleanup rule.
+    </div>
+
+    {% endif %}
+
+</section>
+
+
+{% endif %}
+
+
+<style>
+
+.danger-panel {
+    border-color:
+        rgba(255, 80, 100, .28);
+}
+
+
+.confirm-form {
+    max-width: 640px;
+
+    margin-top: 24px;
+}
+
+
+.confirm-form .form-input {
+    margin-bottom: 12px;
+}
+
+
+.destructive-button {
+    border-color:
+        rgba(255, 75, 95, .45);
+
+    background:
+        rgba(255, 75, 95, .12);
+
+    color:
+        #ff9aa8;
+}
+
+
+.cleanup-note {
+    margin-top: 18px;
+
+    padding: 12px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 7px;
+
+    color: var(--muted);
+
+    font-size: 11px;
+
+    line-height: 1.6;
+}
+
+
+.cleanup-blocked {
+    margin-top: 18px;
+
+    padding: 13px;
+
+    border:
+        1px solid rgba(255, 80, 100, .3);
+
+    border-radius: 7px;
+
+    background:
+        rgba(255, 80, 100, .06);
+
+    color: #ff9aa8;
+}
+
+
+.maintenance-preview-table {
+    margin-top: 18px;
+}
+
+</style>
+
+
+{% endblock %}

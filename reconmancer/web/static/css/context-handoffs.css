@@ -1,0 +1,353 @@
+.context-badge {
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        5px;
+
+    margin-left:
+        7px;
+
+    padding:
+        3px 6px;
+
+    border-radius:
+        5px;
+
+    font-size:
+        9px;
+
+    font-weight:
+        800;
+
+    line-height:
+        1.25;
+
+    vertical-align:
+        middle;
+
+    letter-spacing:
+        .04em;
+}
+
+
+.context-badge-anonymous {
+    border:
+        1px solid
+        rgba(
+            130,
+            140,
+            160,
+            .22
+        );
+
+    background:
+        rgba(
+            130,
+            140,
+            160,
+            .08
+        );
+
+    color:
+        #aeb4c4;
+}
+
+
+.context-badge-authenticated {
+    border:
+        1px solid
+        rgba(
+            155,
+            115,
+            255,
+            .30
+        );
+
+    background:
+        rgba(
+            155,
+            115,
+            255,
+            .10
+        );
+
+    color:
+        #cebaff;
+}
+
+
+.current-context {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        8px;
+
+    margin-left:
+        auto;
+}
+
+
+.auth-handoff-panel {
+    border-color:
+        rgba(
+            155,
+            115,
+            255,
+            .24
+        );
+}
+
+
+.auth-handoff-intro {
+    margin-bottom:
+        16px;
+
+    padding:
+        12px 14px;
+
+    border:
+        1px solid
+        rgba(
+            155,
+            115,
+            255,
+            .18
+        );
+
+    border-radius:
+        8px;
+
+    background:
+        rgba(
+            155,
+            115,
+            255,
+            .035
+        );
+
+    color:
+        var(--muted);
+
+    font-size:
+        11px;
+
+    line-height:
+        1.55;
+}
+
+
+.auth-handoff-grid {
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(
+                300px,
+                1fr
+            )
+        );
+
+    gap:
+        14px;
+}
+
+
+.auth-handoff-card {
+    padding:
+        15px;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:
+        9px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            .014
+        );
+}
+
+
+.auth-handoff-card h3 {
+    margin-top:
+        0;
+
+    margin-bottom:
+        5px;
+}
+
+
+.auth-handoff-card > p {
+    margin:
+        0 0 14px;
+
+    color:
+        var(--muted);
+
+    font-size:
+        11px;
+
+    line-height:
+        1.5;
+}
+
+
+.auth-handoff-fields {
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(
+                0,
+                1fr
+            )
+        );
+
+    gap:
+        10px;
+
+    margin-top:
+        12px;
+}
+
+
+.auth-handoff-checks {
+    display:
+        flex;
+
+    flex-wrap:
+        wrap;
+
+    gap:
+        8px 14px;
+
+    margin-top:
+        12px;
+}
+
+
+.auth-handoff-checks label {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        6px;
+
+    color:
+        var(--muted);
+
+    font-size:
+        11px;
+}
+
+
+.auth-handoff-eligibility {
+    margin-top:
+        10px;
+
+    padding:
+        8px 9px;
+
+    border-radius:
+        6px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            .025
+        );
+
+    color:
+        var(--muted);
+
+    font-size:
+        10px;
+}
+
+
+.auth-handoff-eligibility.good {
+    color:
+        #8fe1b4;
+}
+
+
+.auth-handoff-eligibility.warning {
+    color:
+        #ffd180;
+}
+
+
+.auth-handoff-eligibility.bad {
+    color:
+        #ff9aa8;
+}
+
+
+.auth-handoff-submit {
+    margin-top:
+        14px;
+}
+
+
+.auth-handoff-safety {
+    margin-top:
+        9px;
+
+    color:
+        var(--muted);
+
+    font-size:
+        10px;
+
+    line-height:
+        1.45;
+}
+
+
+.context-profile-name {
+    max-width:
+        170px;
+
+    overflow:
+        hidden;
+
+    text-overflow:
+        ellipsis;
+
+    white-space:
+        nowrap;
+}
+
+
+@media (
+    max-width: 700px
+) {
+
+    .auth-handoff-fields {
+        grid-template-columns:
+            1fr;
+    }
+
+}

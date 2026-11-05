@@ -1,0 +1,868 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+HTTPX · {{ project.config.project.name }}
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="page-header">
+
+    <div>
+
+        <div class="eyebrow">
+            HTTPX ENGINE
+        </div>
+
+        <h1>
+            HTTPX
+        </h1>
+
+        <p class="muted">
+            Asset intelligence, fingerprints,
+            redirects, screenshots and HTTP observations.
+        </p>
+
+    </div>
+
+
+    <div class="status-pill">
+        Anonymous baseline
+    </div>
+
+</div>
+
+
+<section class="panel scan-panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                New HTTPX Scan
+            </h2>
+
+            <p class="muted">
+                Upload a target list or enter targets manually.
+                Only scan systems you are authorized to test.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <form
+        method="post"
+        enctype="multipart/form-data"
+        action="/p/{{ project.config.project.slug }}/httpx/new/"
+    >
+
+
+        <div class="upload-zone">
+
+            <label class="form-label">
+                Upload targets.txt
+            </label>
+
+
+            <input
+                class="file-input"
+                type="file"
+                name="targets_file"
+                accept=".txt,text/plain"
+            >
+
+
+            <div class="form-help">
+
+                One target per line.
+
+                Blank lines and lines beginning with
+                # are ignored.
+
+            </div>
+
+        </div>
+
+
+        <div class="input-separator">
+
+            <span>
+                OR
+            </span>
+
+        </div>
+
+
+        <label class="form-label">
+            Paste Targets
+        </label>
+
+
+        <textarea
+            class="target-input"
+            name="targets"
+            rows="6"
+            placeholder="https://example.com&#10;subdomain.example.com&#10;https://api.example.com"
+        ></textarea>
+
+
+        <div class="form-help">
+
+            Optional. Pasted targets are combined
+            with the uploaded file and duplicates
+            are automatically removed.
+
+        </div>
+
+
+        <div class="scan-options">
+
+
+            <div>
+
+                <label class="form-label">
+                    Rate limit
+                </label>
+
+
+                <input
+                    class="form-input"
+                    type="number"
+                    name="rate_limit"
+                    value="10"
+                    min="1"
+                    max="1000"
+                >
+
+
+                <div class="form-help">
+                    Maximum HTTPX requests per second
+                </div>
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Redirect depth
+                </label>
+
+
+                <input
+                    class="form-input"
+                    type="number"
+                    name="redirect_depth"
+                    value="10"
+                    min="0"
+                    max="50"
+                >
+
+
+                <div class="form-help">
+                    Maximum recursive redirect depth
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <div class="screenshot-option">
+
+            <label>
+
+                <input
+                    type="checkbox"
+                    name="screenshots"
+                    value="1"
+                >
+
+                <span>
+                    Capture screenshots after HTTPX completes
+                </span>
+
+            </label>
+
+
+            <div class="form-help">
+
+                Runs as a separate sequential pass to
+                reduce RAM usage. Only useful HTML-like
+                pages are captured.
+
+            </div>
+
+        </div>
+
+
+        <button
+            class="button scan-button"
+            type="submit"
+        >
+            Start HTTPX Scan
+        </button>
+
+
+    </form>
+
+</section>
+
+
+{% if latest %}
+
+
+<div class="stats-grid">
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Latest Run
+        </span>
+
+        <strong class="stat-value stat-small">
+            {{ latest.id }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Observations
+        </span>
+
+        <strong class="stat-value">
+            {{ latest_stats.total }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            2xx
+        </span>
+
+        <strong class="stat-value">
+            {{ latest_stats.status_2xx }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Redirects
+        </span>
+
+        <strong class="stat-value">
+            {{ latest_stats.redirects }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Screenshots
+        </span>
+
+        <strong class="stat-value">
+            {{ latest_stats.screenshots }}
+        </strong>
+
+    </div>
+
+
+</div>
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Latest Run
+            </h2>
+
+            <p class="muted">
+                {{ latest.started_at }}
+            </p>
+
+        </div>
+
+
+        <a
+            class="button"
+            href="/p/{{ project.config.project.slug }}/httpx/run/{{ latest.id }}/"
+        >
+            View Results
+        </a>
+
+    </div>
+
+</section>
+
+
+{% endif %}
+
+
+<section class="panel">
+
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Jobs
+            </h2>
+
+            <p class="muted">
+                Live HTTPX workers and screenshot progress.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if jobs %}
+
+
+    <div class="table-wrap">
+
+        <table class="data-table">
+
+            <thead>
+
+            <tr>
+
+                <th>Job</th>
+
+                <th>Status</th>
+
+                <th>Targets</th>
+
+                <th>Observations</th>
+
+                <th>Redirects</th>
+
+                <th>Screenshots</th>
+
+                <th>Created</th>
+
+                <th>Run</th>
+
+            </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+            {% for job in jobs %}
+
+
+            <tr
+                data-job-id="{{ job.id }}"
+                data-job-status="{{ job.status }}"
+                data-run-id="{{ job.run_id or '' }}"
+            >
+
+
+                <td class="mono">
+                    {{ job.id }}
+                </td>
+
+
+                <td>
+
+                    <span class="run-status status-{{ job.status }}">
+                        {{ job.status }}
+                    </span>
+
+                </td>
+
+
+                <td class="job-targets">
+                    {{ job.target_count }}
+                </td>
+
+
+                <td class="job-observations">
+                    {{ job.observations }}
+                </td>
+
+
+                <td class="job-redirects">
+                    {{ job.redirects }}
+                </td>
+
+
+                <td class="job-screenshots">
+
+                    {% if job.screenshots_requested %}
+
+                        {{ job.screenshots }}
+
+                    {% else %}
+
+                        <span class="muted">
+                            disabled
+                        </span>
+
+                    {% endif %}
+
+                </td>
+
+
+                <td class="mono muted">
+                    {{ job.created_at }}
+                </td>
+
+
+                <td class="job-run">
+
+                    {% if job.run_id %}
+
+                    <a
+                        class="table-link"
+                        href="/p/{{ project.config.project.slug }}/httpx/run/{{ job.run_id }}/"
+                    >
+                        {{ job.run_id }}
+                    </a>
+
+                    {% else %}
+
+                    <span class="muted">
+                        —
+                    </span>
+
+                    {% endif %}
+
+                </td>
+
+
+            </tr>
+
+
+            {% endfor %}
+
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    {% else %}
+
+
+    <p class="muted">
+        No background HTTPX jobs yet.
+    </p>
+
+
+    {% endif %}
+
+
+</section>
+
+
+<section class="panel">
+
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Run History
+            </h2>
+
+            <p class="muted">
+                Previous HTTPX executions.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if runs %}
+
+
+    <div class="table-wrap">
+
+        <table class="data-table">
+
+
+            <thead>
+
+            <tr>
+
+                <th>Run</th>
+
+                <th>Status</th>
+
+                <th>Context</th>
+
+                <th>Inputs</th>
+
+                <th>Results</th>
+
+                <th>Started</th>
+
+                <th></th>
+
+            </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+            {% for run in runs %}
+
+
+            <tr>
+
+
+                <td class="mono">
+                    {{ run.id }}
+                </td>
+
+
+                <td>
+
+                    <span class="run-status status-{{ run.status }}">
+                        {{ run.status }}
+                    </span>
+
+                </td>
+
+
+                <td>
+                    {{ run.context }}
+                </td>
+
+
+                <td>
+                    {{ run.input_count }}
+                </td>
+
+
+                <td>
+                    {{ run.result_count }}
+                </td>
+
+
+                <td class="mono muted">
+                    {{ run.started_at }}
+                </td>
+
+
+                <td>
+
+                    <a
+                        class="table-link"
+                        href="/p/{{ project.config.project.slug }}/httpx/run/{{ run.id }}/"
+                    >
+                        Open
+                    </a>
+
+                </td>
+
+
+            </tr>
+
+
+            {% endfor %}
+
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    {% endif %}
+
+
+</section>
+
+
+<style>
+
+.screenshot-option {
+    margin-top: 22px;
+
+    padding: 15px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 9px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.018
+        );
+}
+
+
+.screenshot-option label {
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    cursor: pointer;
+
+    font-size: 13px;
+}
+
+
+.screenshot-option input {
+    width: 16px;
+    height: 16px;
+}
+
+</style>
+
+
+<script>
+
+const HTTPX_STATUS_URL =
+    "/p/{{ project.config.project.slug }}/httpx/status.json";
+
+
+let reloadScheduled = false;
+
+
+async function refreshHttpxJobs() {
+
+    try {
+
+        const response =
+            await fetch(
+                HTTPX_STATUS_URL,
+                {
+                    cache: "no-store"
+                }
+            );
+
+
+        if (!response.ok) {
+            return;
+        }
+
+
+        const data =
+            await response.json();
+
+
+        for (
+            const job
+            of data.jobs
+        ) {
+
+            const row =
+                document.querySelector(
+                    `[data-job-id="${job.id}"]`
+                );
+
+
+            if (!row) {
+                continue;
+            }
+
+
+            const previousStatus =
+                row.dataset.jobStatus
+                || "";
+
+
+            const previousRun =
+                row.dataset.runId
+                || "";
+
+
+            row.dataset.jobStatus =
+                job.status
+                || "";
+
+
+            const status =
+                row.querySelector(
+                    ".run-status"
+                );
+
+
+            if (status) {
+
+                status.textContent =
+                    job.status;
+
+                status.className =
+                    `run-status status-${job.status}`;
+
+            }
+
+
+            const targets =
+                row.querySelector(
+                    ".job-targets"
+                );
+
+            if (targets) {
+
+                targets.textContent =
+                    job.target_count;
+
+            }
+
+
+            const observations =
+                row.querySelector(
+                    ".job-observations"
+                );
+
+            if (observations) {
+
+                observations.textContent =
+                    job.observations;
+
+            }
+
+
+            const redirects =
+                row.querySelector(
+                    ".job-redirects"
+                );
+
+            if (redirects) {
+
+                redirects.textContent =
+                    job.redirects;
+
+            }
+
+
+            const screenshots =
+                row.querySelector(
+                    ".job-screenshots"
+                );
+
+            if (
+                screenshots
+                && job.screenshots_requested
+            ) {
+
+                screenshots.textContent =
+                    job.screenshots;
+
+            }
+
+
+            if (
+                job.run_id
+                && previousRun !== job.run_id
+            ) {
+
+                row.dataset.runId =
+                    job.run_id;
+
+
+                const runCell =
+                    row.querySelector(
+                        ".job-run"
+                    );
+
+
+                if (runCell) {
+
+                    runCell.innerHTML =
+                        `<a
+                            class="table-link"
+                            href="/p/{{ project.config.project.slug }}/httpx/run/${job.run_id}/"
+                        >${job.run_id}</a>`;
+
+                }
+
+            }
+
+
+            if (
+                (
+                    job.status === "completed"
+                    ||
+                    job.status === "failed"
+                )
+                &&
+                previousStatus !== job.status
+                &&
+                !reloadScheduled
+            ) {
+
+                reloadScheduled = true;
+
+                setTimeout(
+                    () => {
+                        window.location.reload();
+                    },
+                    1200
+                );
+
+            }
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "HTTPX status refresh failed:",
+            error
+        );
+
+    }
+
+}
+
+
+refreshHttpxJobs();
+
+
+setInterval(
+    refreshHttpxJobs,
+    2000
+);
+
+</script>
+
+
+{% endblock %}

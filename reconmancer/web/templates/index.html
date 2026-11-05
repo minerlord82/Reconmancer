@@ -1,0 +1,367 @@
+{% extends "base.html" %}
+
+{% block title %}
+Reconmancer
+{% endblock %}
+
+
+{% block content %}
+
+<section class="brand-hero arcane-banner" aria-label="Reconmancer identity">
+    <picture>
+        <source media="(max-width: 680px)" srcset="{{ url_for('static', filename='img/arcane-banner-mobile.webp') }}">
+        <img class="brand-hero-image" src="{{ url_for('static', filename='img/arcane-banner.webp') }}" alt="Reconmancer: see further, uncover more. An arcane eye above a moonlit citadel." width="1379" height="274" decoding="async" fetchpriority="high">
+    </picture>
+</section>
+
+<div class="page-header registry-header">
+
+    <div>
+
+        <div class="eyebrow">
+            RECONNAISSANCE
+        </div>
+
+        <h1>Quest Registry <span class="heading-flourish" aria-hidden="true">✦</span></h1>
+
+        <p class="muted">
+            Create, open and manage reconnaissance projects.
+        </p>
+
+    </div>
+
+</div>
+
+
+{% if request.args.get('message') %}
+<div class="project-message">
+    {{ request.args.get('message') }}
+</div>
+{% endif %}
+
+
+{% if request.args.get('error') %}
+<div class="project-error">
+    {{ request.args.get('error') }}
+</div>
+{% endif %}
+
+
+<section class="panel project-create-panel">
+
+    <div class="panel-header">
+
+        <div>
+            <h2>Inscribe a New Quest</h2>
+
+            <p class="muted">
+                Each quest gets its own database, raw output,
+                evidence, settings and authentication profiles.
+            </p>
+        </div>
+
+    </div>
+
+
+    <form
+        method="post"
+        action="/projects/create/"
+        class="project-create-form"
+    >
+
+        <div>
+            <label class="form-label">Project name</label>
+
+            <input
+                class="form-input"
+                type="text"
+                name="name"
+                maxlength="120"
+                required
+                placeholder="Example Program"
+            >
+        </div>
+
+
+        <div>
+            <label class="form-label">Slug</label>
+
+            <input
+                class="form-input"
+                type="text"
+                name="slug"
+                maxlength="64"
+                placeholder="example-program"
+            >
+
+            <div class="project-form-help">
+                Optional. Leave blank to generate it from the name.
+            </div>
+        </div>
+
+
+        <div>
+            <label class="form-label">Disk budget (GB)</label>
+
+            <input
+                class="form-input"
+                type="number"
+                name="disk_limit_gb"
+                min="1"
+                max="1000"
+                step="0.5"
+                value="10"
+            >
+        </div>
+
+
+        <div class="project-create-action">
+            <button
+                class="button"
+                type="submit"
+            >
+                Create Quest
+            </button>
+        </div>
+
+    </form>
+
+</section>
+
+
+<div class="registry-title" aria-hidden="true"><span>THE ACTIVE CHAPTERS</span><span class="registry-ornament">✦ ━ ✧ ━ ✦</span></div>
+<div class="project-grid">
+
+    {% for item in projects %}
+
+    <div class="project-card project-card-managed">
+
+        <div class="project-card-main">
+
+            <img
+                class="project-icon-image"
+                src="{{ url_for('static', filename='img/reconmancer-mark.webp') }}"
+                alt=""
+                width="43"
+                height="43"
+            >
+
+            <div class="project-card-copy">
+
+                <h3>
+                    {{ item.name }}
+                </h3>
+
+                <div class="muted mono">
+                    {{ item.slug }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="project-card-actions">
+
+            <a
+                class="button"
+                href="/p/{{ item.slug }}/"
+            >
+                Open
+            </a>
+
+
+            <details class="project-delete-details">
+
+                <summary>
+                    Delete
+                </summary>
+
+                <form
+                    method="post"
+                    action="/projects/{{ item.slug }}/delete/"
+                    class="project-delete-form"
+                >
+
+                    <p>
+                        Deletes the entire project directory, including
+                        settings, targets, authentication profiles,
+                        scan data and evidence.
+                    </p>
+
+                    <label class="form-label">
+                        Type <span class="mono">{{ item.slug }}</span>
+                    </label>
+
+                    <input
+                        class="form-input"
+                        name="confirm"
+                        autocomplete="off"
+                        required
+                    >
+
+                    <button
+                        class="button project-danger-button"
+                        type="submit"
+                    >
+                        Delete Project
+                    </button>
+
+                </form>
+
+            </details>
+
+        </div>
+
+    </div>
+
+    {% else %}
+
+    <div class="empty-state-branded">
+
+        <img
+            class="empty-state-mark"
+            src="{{ url_for('static', filename='img/reconmancer-mark.webp') }}"
+            alt=""
+            width="56"
+            height="56"
+        >
+
+        <div>
+            <h2>No quests yet</h2>
+            <p>
+                The scrying circle is quiet. Create your first Reconmancer project above.
+            </p>
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+
+<style>
+.project-message,
+.project-error {
+    margin-bottom: 14px;
+    padding: 11px 13px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 12px;
+}
+
+.project-message {
+    background: rgba(85, 180, 125, .06);
+    border-color: rgba(85, 180, 125, .24);
+}
+
+.project-error {
+    background: rgba(255, 90, 105, .06);
+    border-color: rgba(255, 90, 105, .28);
+}
+
+.project-create-panel {
+    margin-bottom: 20px;
+}
+
+.project-create-form {
+    display: grid;
+    grid-template-columns: minmax(220px, 2fr) minmax(180px, 1.4fr) minmax(130px, .7fr) auto;
+    gap: 12px;
+    align-items: end;
+}
+
+.project-create-action {
+    display: flex;
+    align-items: end;
+}
+
+.project-form-help {
+    margin-top: 5px;
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.project-card-managed {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.project-card-main {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.project-card-copy {
+    min-width: 0;
+}
+
+.project-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 14px;
+}
+
+.project-delete-details {
+    position: relative;
+}
+
+.project-delete-details > summary {
+    cursor: pointer;
+    color: #ff9aa8;
+    font-size: 11px;
+    user-select: none;
+}
+
+.project-delete-form {
+    position: absolute;
+    z-index: 20;
+    top: 28px;
+    right: 0;
+    width: 310px;
+    padding: 14px;
+    border: 1px solid rgba(255, 90, 105, .32);
+    border-radius: 9px;
+    background: var(--panel-2);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, .35);
+}
+
+.project-delete-form p {
+    margin-top: 0;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.project-danger-button {
+    margin-top: 10px;
+    border-color: rgba(255, 90, 105, .5);
+    background: rgba(255, 90, 105, .08);
+    color: #ffb1ba;
+}
+
+@media (max-width: 900px) {
+    .project-create-form {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 620px) {
+    .project-create-form {
+        grid-template-columns: 1fr;
+    }
+
+    .project-delete-form {
+        position: fixed;
+        left: 18px;
+        right: 18px;
+        top: auto;
+        width: auto;
+    }
+}
+</style>
+
+{% endblock %}

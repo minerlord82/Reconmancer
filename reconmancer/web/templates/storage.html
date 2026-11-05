@@ -1,0 +1,899 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Storage · {{ project.config.project.name }}
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="page-header">
+
+    <div>
+
+        <div class="eyebrow">
+            QUEST STORAGE
+        </div>
+
+        <h1>
+            Storage
+        </h1>
+
+        <p class="muted">
+            Disk usage, artifacts and controlled cleanup.
+        </p>
+
+    </div>
+
+
+    <div class="status-pill">
+
+        {{ "%.2f"|format(workspace.percentage) }}%
+
+    </div>
+
+</div>
+
+
+{% if message %}
+
+<div class="storage-message">
+    {{ message }}
+</div>
+
+{% endif %}
+
+{% if error %}
+
+<div class="storage-error">
+    {{ error }}
+</div>
+
+{% endif %}
+
+
+<div class="stats-grid">
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Used
+        </span>
+
+        <strong class="stat-value stat-small">
+            {{ workspace.used_bytes|human_bytes }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Budget
+        </span>
+
+        <strong class="stat-value stat-small">
+            {{ workspace.limit_bytes|human_bytes }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Budget Remaining
+        </span>
+
+        <strong class="stat-value stat-small">
+            {{ workspace.free_budget_bytes|human_bytes }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Files
+        </span>
+
+        <strong class="stat-value">
+            {{ workspace.total_files }}
+        </strong>
+
+    </div>
+
+
+</div>
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Project Budget
+            </h2>
+
+            <p class="muted">
+                Current project limit: 10 GB
+            </p>
+
+        </div>
+
+
+        <div class="mono muted">
+
+            {{ workspace.used_bytes|human_bytes }}
+            /
+            {{ workspace.limit_bytes|human_bytes }}
+
+        </div>
+
+    </div>
+
+
+    <div class="storage-budget-track">
+
+        <div
+            class="storage-budget-fill"
+            style="width: {{ workspace.percentage }}%;"
+        ></div>
+
+    </div>
+
+</section>
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Usage Breakdown
+            </h2>
+
+            <p class="muted">
+                Physical files currently stored
+                by the quest.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="table-wrap">
+
+        <table class="data-table">
+
+            <thead>
+
+            <tr>
+
+                <th>Category</th>
+                <th>Files</th>
+                <th>Size</th>
+                <th>Share</th>
+
+            </tr>
+
+            </thead>
+
+
+            <tbody>
+
+            {% for item in workspace.categories %}
+
+            <tr>
+
+                <td>
+                    {{ item.label }}
+                </td>
+
+                <td>
+
+                    {% if item.files is not none %}
+                        {{ item.files }}
+                    {% else %}
+                        —
+                    {% endif %}
+
+                </td>
+
+                <td class="mono">
+                    {{ item.bytes|human_bytes }}
+                </td>
+
+                <td>
+
+                    <div class="category-share">
+
+                        <div class="mini-track">
+
+                            <div
+                                class="mini-fill"
+                                style="width: {{ item.percentage }}%;"
+                            ></div>
+
+                        </div>
+
+                        <span class="mono muted">
+                            {{ "%.2f"|format(item.percentage) }}%
+                        </span>
+
+                    </div>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Maintenance
+            </h2>
+
+            <p class="muted">
+                Every action opens a preview first.
+                Nothing here runs automatically.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="maintenance-grid">
+
+
+        <form
+            method="post"
+            action="/p/{{ project.config.project.slug }}/storage/maintenance/temp/preview/"
+            class="maintenance-card"
+        >
+
+            <strong>
+                Temporary Files
+            </strong>
+
+            <span>
+                Preview temp files older than 24 hours.
+            </span>
+
+            <button
+                class="button secondary"
+                type="submit"
+            >
+                Preview
+            </button>
+
+        </form>
+
+
+        <form
+            method="post"
+            action="/p/{{ project.config.project.slug }}/storage/maintenance/job-inputs/preview/"
+            class="maintenance-card"
+        >
+
+            <strong>
+                Old Job Inputs
+            </strong>
+
+            <span>
+                Preview completed/failed job staging
+                older than 7 days.
+            </span>
+
+            <button
+                class="button secondary"
+                type="submit"
+            >
+                Preview
+            </button>
+
+        </form>
+
+
+        <form
+            method="post"
+            action="/p/{{ project.config.project.slug }}/storage/maintenance/job-logs/preview/"
+            class="maintenance-card"
+        >
+
+            <strong>
+                Old Job Logs
+            </strong>
+
+            <span>
+                Preview terminal job logs older
+                than 30 days.
+            </span>
+
+            <button
+                class="button secondary"
+                type="submit"
+            >
+                Preview
+            </button>
+
+        </form>
+
+
+    </div>
+
+</section>
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Run Storage
+            </h2>
+
+            <p class="muted">
+                Deleting a run requires a preview and
+                exact run-ID confirmation.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="table-wrap">
+
+        <table class="data-table">
+
+            <thead>
+
+            <tr>
+
+                <th>Run</th>
+                <th>Engine</th>
+                <th>Status</th>
+                <th>Inputs</th>
+                <th>Results</th>
+                <th>Raw Files</th>
+                <th>Raw Size</th>
+                <th></th>
+
+            </tr>
+
+            </thead>
+
+
+            <tbody>
+
+            {% for run in workspace.runs %}
+
+            <tr>
+
+                <td class="mono">
+                    {{ run.id }}
+                </td>
+
+                <td>
+                    {{ run.engine|upper }}
+                </td>
+
+                <td>
+
+                    <span class="run-status status-{{ run.status }}">
+                        {{ run.status }}
+                    </span>
+
+                </td>
+
+                <td>
+                    {{ run.input_count or 0 }}
+                </td>
+
+                <td>
+                    {{ run.result_count or 0 }}
+                </td>
+
+                <td>
+                    {{ run.raw_files }}
+                </td>
+
+                <td class="mono">
+                    {{ run.raw_bytes|human_bytes }}
+                </td>
+
+                <td>
+
+                    <form
+                        method="post"
+                        action="/p/{{ project.config.project.slug }}/storage/run/{{ run.id }}/preview/"
+                    >
+
+                        <button
+                            class="button secondary danger-outline"
+                            type="submit"
+                        >
+                            Preview Delete
+                        </button>
+
+                    </form>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Content-Addressed Artifacts
+            </h2>
+
+            <p class="muted">
+                Only artifacts with zero database
+                references can be deleted individually.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if workspace.artifacts %}
+
+
+    <div class="table-wrap">
+
+        <table class="data-table">
+
+            <thead>
+
+            <tr>
+
+                <th>Hash</th>
+                <th>Kind</th>
+                <th>Size</th>
+                <th>References</th>
+                <th>Path</th>
+                <th></th>
+
+            </tr>
+
+            </thead>
+
+
+            <tbody>
+
+            {% for artifact in workspace.artifacts %}
+
+            <tr>
+
+                <td class="mono">
+                    {{ artifact.hash[:16] }}…
+                </td>
+
+                <td>
+                    {{ artifact.kind }}
+                </td>
+
+                <td class="mono">
+                    {{ (artifact.size_bytes or 0)|human_bytes }}
+                </td>
+
+                <td>
+                    {{ artifact.references }}
+                </td>
+
+                <td class="mono artifact-path">
+                    {{ artifact.relative_path }}
+                </td>
+
+                <td>
+
+                    {% if artifact.deletable %}
+
+                    <form
+                        method="post"
+                        action="/p/{{ project.config.project.slug }}/storage/artifact/{{ artifact.hash }}/preview/"
+                    >
+
+                        <button
+                            class="button secondary danger-outline"
+                            type="submit"
+                        >
+                            Preview Delete
+                        </button>
+
+                    </form>
+
+                    {% else %}
+
+                    <span class="protected-label">
+                        REFERENCED
+                    </span>
+
+                    {% endif %}
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    {% else %}
+
+    <p class="muted">
+        No content-addressed artifacts stored yet.
+    </p>
+
+    {% endif %}
+
+</section>
+
+
+<div class="storage-footnote">
+
+    Deleting run data does not automatically shrink
+    the SQLite database file. SQLite normally reuses
+    freed pages for future Reconmancer data.
+
+</div>
+
+
+<section class="panel storage-wipe-panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Wipe Collected Data
+            </h2>
+
+            <p class="muted">
+                Reset this quest to an empty reconnaissance state without
+                deleting the project itself.
+            </p>
+
+        </div>
+
+        <div class="storage-danger-label">
+            DANGER ZONE
+        </div>
+
+    </div>
+
+
+    <div class="storage-wipe-grid">
+
+        <div>
+
+            <h3>Removed</h3>
+
+            <p class="muted storage-wipe-copy">
+                Runs, jobs, assets, URLs, redirects, discoveries, findings,
+                analysis data, handoffs, traffic evidence, raw tool output,
+                screenshots, stored responses, evidence objects, generated
+                job inputs, logs and temporary files.
+            </p>
+
+        </div>
+
+
+        <div>
+
+            <h3>Preserved</h3>
+
+            <p class="muted storage-wipe-copy">
+                project.yaml and project settings, input/targets.txt, and
+                authentication profiles under secrets/auth.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <form
+        method="post"
+        action="/p/{{ project.config.project.slug }}/storage/wipe/"
+        class="storage-wipe-form"
+    >
+
+        <div>
+
+            <label class="form-label">
+                Type
+                <span class="mono">WIPE {{ project.config.project.slug }}</span>
+                to confirm
+            </label>
+
+            <input
+                class="form-input"
+                name="confirm"
+                autocomplete="off"
+                required
+            >
+
+        </div>
+
+
+        <button
+            class="button storage-wipe-button"
+            type="submit"
+        >
+            Wipe Collected Data
+        </button>
+
+    </form>
+
+
+    <p class="storage-footnote">
+        The wipe is refused while a queued/running/stale scan job exists.
+        This action cannot be undone.
+    </p>
+
+</section>
+
+
+<style>
+
+.storage-message {
+    margin-bottom: 18px;
+
+    padding: 12px 14px;
+
+    border:
+        1px solid rgba(80, 220, 150, .25);
+
+    border-radius: 8px;
+
+    background:
+        rgba(80, 220, 150, .06);
+
+    color: #8fe1b4;
+
+    font-size: 12px;
+}
+
+
+.storage-budget-track,
+.mini-track {
+    overflow: hidden;
+
+    border-radius: 999px;
+
+    background:
+        rgba(255, 255, 255, .05);
+}
+
+
+.storage-budget-track {
+    height: 10px;
+}
+
+
+.storage-budget-fill,
+.mini-fill {
+    height: 100%;
+
+    background:
+        var(--accent);
+
+    border-radius: inherit;
+}
+
+
+.mini-track {
+    width: 120px;
+    height: 6px;
+}
+
+
+.category-share {
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+}
+
+
+.maintenance-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(220px, 1fr)
+        );
+
+    gap: 12px;
+}
+
+
+.maintenance-card {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+    padding: 14px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 9px;
+}
+
+
+.maintenance-card span {
+    min-height: 34px;
+
+    color: var(--muted);
+
+    font-size: 11px;
+
+    line-height: 1.5;
+}
+
+
+.danger-outline {
+    border-color:
+        rgba(255, 90, 105, .28);
+}
+
+
+.protected-label {
+    padding:
+        4px 6px;
+
+    border-radius: 5px;
+
+    background:
+        rgba(130, 130, 150, .1);
+
+    color: var(--muted);
+
+    font-size: 9px;
+
+    font-weight: 800;
+}
+
+
+.artifact-path {
+    max-width: 320px;
+
+    overflow-wrap: anywhere;
+
+    font-size: 10px;
+}
+
+
+.storage-footnote {
+    margin-top: 16px;
+
+    color: var(--muted);
+
+    font-size: 10px;
+
+    line-height: 1.5;
+}
+
+
+.storage-error {
+    margin-bottom: 14px;
+    padding: 11px 13px;
+    border: 1px solid rgba(255, 90, 105, .28);
+    border-radius: 8px;
+    background: rgba(255, 90, 105, .06);
+    color: #ffc0c7;
+    font-size: 11px;
+}
+
+.storage-wipe-panel {
+    border-color: rgba(255, 90, 105, .24);
+}
+
+.storage-danger-label {
+    padding: 5px 8px;
+    border-radius: 5px;
+    background: rgba(255, 90, 105, .08);
+    color: #ff9aa8;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .08em;
+}
+
+.storage-wipe-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
+.storage-wipe-grid h3 {
+    margin: 0 0 6px;
+    font-size: 12px;
+}
+
+.storage-wipe-copy {
+    margin: 0;
+    line-height: 1.55;
+    font-size: 11px;
+}
+
+.storage-wipe-form {
+    display: grid;
+    grid-template-columns: minmax(240px, 1fr) auto;
+    gap: 12px;
+    align-items: end;
+}
+
+.storage-wipe-button {
+    border-color: rgba(255, 90, 105, .5);
+    background: rgba(255, 90, 105, .08);
+    color: #ffb1ba;
+}
+
+@media (max-width: 700px) {
+    .storage-wipe-grid,
+    .storage-wipe-form {
+        grid-template-columns: 1fr;
+    }
+}
+
+</style>
+
+
+{% endblock %}

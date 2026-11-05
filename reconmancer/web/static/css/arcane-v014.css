@@ -1,0 +1,425 @@
+/* Reconmancer v0.1.4 — THE ARCANE ATLAS
+ * Presentation-only theme; no scan commands, routes, parsing, or JavaScript changed.
+ * Art is self-hosted and compressed. The user-supplied visual mockup is used for
+ * the decorative banner and vignettes; dynamic controls remain real HTML.
+ */
+:root {
+  --bg: #060511;
+  --panel: #0d0a1c;
+  --panel-2: #151028;
+  --border: rgba(151,95,239,.52);
+  --text: #f1eafe;
+  --muted: #c1b4d6;
+  --accent: #bb82ff;
+  --accent-soft: rgba(126,58,255,.17);
+  --success: #49dfd0;
+  --radius: 3px;
+}
+html {scroll-behavior: smooth;}
+body {
+  color: #e9e0fb;
+  background:
+    linear-gradient(180deg,rgba(4,4,15,.18),rgba(4,4,14,.44)),
+    url('../img/arcane-world.webp') center top / cover fixed no-repeat,
+    #080610;
+  font-family: Georgia, 'Times New Roman', serif;
+  line-height: 1.47;
+}
+body::before {
+  opacity:.37;
+  background-image: radial-gradient(#af79ff 0.55px,transparent 0.8px);
+  background-size:51px 51px;
+}
+:focus-visible {outline:2px solid #d4a3ff;outline-offset:3px;}
+::selection {background:rgba(172,99,253,.42);color:#fff;}
+body.has-quest>.topbar {display:none;}
+body.has-quest .layout {min-height:100vh;align-items:stretch;}
+body.has-quest .sidebar {
+  flex:0 0 255px;width:255px;min-width:255px;
+  position:sticky;top:0;align-self:flex-start;height:100vh;
+  padding:9px 13px 92px 17px;
+  overflow-y:auto;overflow-x:hidden;
+  border:1px solid rgba(146,80,243,.55);
+  border-left:0;
+  background:linear-gradient(180deg,rgba(4,5,17,.98) 0%,rgba(6,6,20,.97) 54%,rgba(5,5,17,.73) 84%,rgba(5,5,16,.6) 100%);
+  scrollbar-color:#64418e #090719;
+  box-shadow:inset -1px 0 rgba(181,112,255,.22),5px 0 28px rgba(0,0,0,.4);
+}
+body.has-quest .sidebar::before {
+  content:"";position:absolute;inset:5px;z-index:0;pointer-events:none;
+  background:
+    linear-gradient(90deg,#8155cf 0 14px,transparent 14px calc(100% - 14px),#8155cf calc(100% - 14px)) top / 100% 1px no-repeat,
+    linear-gradient(180deg,rgba(156,91,239,.4),transparent 55%) left top / 1px 100% no-repeat,
+    radial-gradient(circle at 20% 0%,rgba(87,48,150,.18),transparent 50%);
+}
+body.has-quest .nav-scene {
+  position:absolute;left:0;right:0;bottom:0;height:31%;min-height:240px;
+  background:
+    linear-gradient(180deg,#070718 0%,rgba(7,7,24,.24) 30%,rgba(7,7,23,.03) 68%),
+    linear-gradient(0deg,rgba(4,4,16,.22),transparent 50%),
+    url('../img/arcane-sidebar.webp') center bottom / cover no-repeat;
+  opacity:.96;pointer-events:none;
+}
+body.has-quest .sidebar-brand {
+  position:relative;z-index:2;display:flex;align-items:center;gap:6px;
+  min-height:76px;padding:7px 2px 11px;margin:0 3px 15px 0;
+  border-bottom:1px solid rgba(172,109,244,.58);
+}
+body.has-quest .sidebar-brand::after {content:"✦";position:absolute;bottom:-9px;right:0;color:#ac74f3;font-size:13px;}
+body.has-quest .sidebar-brand img {width:48px;height:48px;object-fit:contain;flex:0 0 48px;filter:drop-shadow(0 0 8px rgba(151,80,255,.58));}
+body.has-quest .sidebar-brand-type {display:flex;flex-direction:column;min-width:0;text-align:center;}
+body.has-quest .sidebar-brand-type>span {font-size:clamp(19px,1.5vw,27px);line-height:1.2;letter-spacing:-.065em;color:#f2ecff;text-shadow:0 1px 8px rgba(186,152,253,.42);}
+body.has-quest .sidebar-brand-type small {font-family:Georgia,serif;font-size:11px;font-weight:400;letter-spacing:.14em;color:#bc9add;margin-top:4px;}
+body.has-quest .sidebar .nav-item.nav-overview {display:none;}
+body.has-quest .sidebar .nav-divider {
+  display:block;position:relative;height:auto;z-index:1;
+  border:0;border-top:1px solid rgba(148,80,246,.64);
+  margin:21px 9px 10px 1px;background:none;
+}
+body.has-quest .sidebar .nav-divider::after {content:"✧";position:absolute;right:-5px;top:-11px;font-size:17px;color:#ae7afa;}
+body.has-quest .sidebar .nav-divider span {
+  position:relative;top:11px;padding:0;background:transparent;
+  color:#b680fc;letter-spacing:.29em;font-family:Georgia,serif;
+  font-size:10px;font-weight:normal;
+}
+body.has-quest .sidebar .nav-divider+ .nav-item {margin-top:15px;}
+body.has-quest .sidebar .nav-item {
+  position:relative;z-index:1;display:flex;gap:13px;align-items:center;
+  min-height:42px;margin:0 0 2px 1px;padding:6px 10px;
+  border:1px solid transparent;border-left:1px solid rgba(152,87,232,.8);
+  border-radius:2px;color:#ded1f0;
+  font-family:Georgia,serif;font-size:13px;letter-spacing:.005em;
+  background:transparent;box-shadow:none;
+}
+body.has-quest .sidebar .nav-item::before {display:none;}
+body.has-quest .sidebar .nav-item.active,
+body.has-quest .sidebar .nav-item:hover {
+  color:#fff;border-color:#7150b1;
+  background:linear-gradient(90deg,rgba(105,39,202,.32),rgba(84,32,158,.09));
+  box-shadow:inset 3px 0 #ad68ff,0 0 16px rgba(113,48,229,.13);
+}
+body.has-quest .nav-icon-image {
+  display:block;width:24px;height:24px;flex:0 0 24px;
+  object-fit:contain;object-position:center;border-radius:0;
+  filter:drop-shadow(0 0 4px rgba(144,79,250,.35));
+}
+body.has-quest .sidebar-signature {display:none;}
+body.has-quest .sidebar-registry {
+  position:absolute;left:17px;right:17px;bottom:10px;z-index:2;
+  text-align:center;padding:8px;border:1px solid rgba(130,75,196,.36);
+  background:rgba(5,4,15,.65);color:#e0c6ff;
+  font-family:Georgia,serif;font-size:10px;letter-spacing:.15em;
+}
+body.has-quest .sidebar-registry:hover {background:#27123f;}
+body.has-quest .content {
+  position:relative;min-width:0;max-width:none;flex:1;width:calc(100% - 255px);
+  padding:10px clamp(12px,1.2vw,23px) 65px;
+}
+body.has-quest .content::before {
+  content:"";pointer-events:none;position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(180deg,rgba(6,5,17,.18),rgba(6,5,17,.42));
+}
+body.has-quest .chapter-rule {display:none;}
+
+/* Etched art frame: four corner jewels and a precise purple inset border. */
+body.has-quest .content .brand-hero {
+  position:relative;overflow:hidden;display:block;max-width:none;
+  min-height:0;height:auto;margin:0 0 14px;padding:0;
+  background:#080714;border:1px solid #8d4ad1;border-radius:0;
+  box-shadow:0 0 0 3px rgba(5,3,14,.94),inset 0 0 28px rgba(179,113,255,.18);
+}
+body.has-quest .brand-hero::before,
+body.has-quest .brand-hero::after {display:none;}
+body.has-quest .brand-hero picture {display:block;}
+body.has-quest .brand-hero-image {
+  display:block;width:100%;height:auto;max-height:none;aspect-ratio:1379 / 274;
+  object-fit:contain;object-position:center center;transform:none;
+}
+body.has-quest .page-header {
+  position:relative;display:flex;gap:18px;justify-content:space-between;align-items:center;
+  min-height:118px;padding:21px 23px 24px 88px;margin:14px 0 11px;
+  border:1px solid rgba(125,63,209,.69);border-radius:2px;
+  background:
+    linear-gradient(90deg,rgba(7,6,20,.93) 0%,rgba(8,7,21,.61) 53%,rgba(6,5,15,.86) 100%),
+    url('../img/arcane-quest.webp') 58% 46% / cover no-repeat;
+  box-shadow:inset 0 0 0 4px rgba(3,3,13,.8),inset 0 0 0 5px rgba(161,100,252,.2);
+}
+body.has-quest .page-header::before {
+  content:"";position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  width:63px;height:63px;pointer-events:none;
+  background:url('../img/reconmancer-mark.webp') center / contain no-repeat;
+  filter:drop-shadow(0 0 11px rgba(157,82,255,.6));
+}
+body.has-quest .page-header::after {
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    linear-gradient(90deg,#a86bff,#a86bff) 4px 4px / 33px 1px no-repeat,
+    linear-gradient(180deg,#a86bff,#a86bff) 4px 4px / 1px 32px no-repeat,
+    linear-gradient(270deg,#a86bff,#a86bff) calc(100% - 4px) 4px / 33px 1px no-repeat,
+    linear-gradient(180deg,#a86bff,#a86bff) calc(100% - 4px) 4px / 1px 32px no-repeat,
+    linear-gradient(90deg,#a86bff,#a86bff) 4px calc(100% - 4px) / 33px 1px no-repeat,
+    linear-gradient(0deg,#a86bff,#a86bff) 4px calc(100% - 4px) / 1px 32px no-repeat,
+    linear-gradient(270deg,#a86bff,#a86bff) calc(100% - 4px) calc(100% - 4px) / 33px 1px no-repeat,
+    linear-gradient(0deg,#a86bff,#a86bff) calc(100% - 4px) calc(100% - 4px) / 1px 32px no-repeat;
+  opacity:.7;
+}
+body.has-quest .page-header>* {position:relative;z-index:1;}
+body.has-quest .page-header .eyebrow,
+body.registry-view .page-header .eyebrow {
+  font-family:Georgia,serif;font-size:10px;font-weight:400;
+  letter-spacing:.26em;color:#b684fc;
+}
+body.has-quest .page-header h1 {
+  font-family:Georgia,'Times New Roman',serif;font-size:clamp(27px,2.8vw,42px);
+  font-weight:400;letter-spacing:.05em;line-height:1.1;
+  margin:7px 0 5px;color:#f3ecfb;text-shadow:0 2px 9px rgba(170,118,246,.23);
+}
+body.has-quest .page-header p {color:#d6c9e7;font-family:Georgia,serif;font-size:13px;letter-spacing:.06em;line-height:1.4;}
+body.has-quest .quest-prophecy {
+  display:flex;flex-direction:column;min-width:206px;
+  margin-left:auto;color:#c7b8db;font-family:Georgia,serif;
+  font-style:italic;font-size:12px;line-height:1.5;letter-spacing:.03em;
+}
+body.has-quest .quest-prophecy::after {content:"";width:40px;height:2px;background:#cab5ef;margin-top:13px;}
+body.has-quest .status-pill {
+  flex:0 0 auto;border:1px solid #9354e7;border-radius:22px;
+  padding:10px 17px;color:#51f8d7;
+  background:rgba(5,5,18,.84);
+  box-shadow:0 0 18px rgba(100,63,172,.35),inset 0 0 10px rgba(80,35,150,.27);
+  font-family:Georgia,serif;font-size:12px;letter-spacing:.015em;
+}
+body.has-quest .status-pill::before {content:"●";font-size:11px;color:#40e9d6;margin-right:9px;text-shadow:0 0 10px #42e2db;}
+
+/* The discovery ledger is a single jewel-framed instrument, not five cards. */
+body.has-quest .ledger-label {display:none;}
+body.has-quest .stats-grid {
+  position:relative;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;
+  margin:0 0 13px;padding:7px 4px;
+  border:1px solid rgba(137,71,237,.75);border-radius:2px;
+  background:
+    linear-gradient(180deg,rgba(8,7,22,.84),rgba(9,7,23,.79)),
+    url('../img/arcane-world.webp') center 58% / cover no-repeat;
+  box-shadow:inset 0 0 0 4px #080719,inset 0 0 0 5px rgba(173,101,255,.23);
+}
+body.has-quest .stat-card {
+  position:relative;min-width:0;min-height:80px;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:10px 8px 8px clamp(58px,6.1vw,96px);
+  border:0;border-right:1px solid rgba(190,117,255,.7);
+  background:none;box-shadow:none;border-radius:0;
+}
+body.has-quest .stat-card:last-child {border-right:0;}
+body.has-quest .stat-card::before {
+  content:"";display:block;position:absolute;left:clamp(10px,2vw,26px);top:50%;transform:translateY(-50%);
+  width:47px;height:47px;pointer-events:none;
+  background:url('../img/rune-analysis.webp') center / contain no-repeat;
+  filter:drop-shadow(0 0 9px rgba(179,105,255,.66));
+}
+body.has-quest .stat-card:nth-child(1)::before {background-image:url('../img/rune-analysis.webp');}
+body.has-quest .stat-card:nth-child(2)::before {background-image:url('../img/rune-httpx.webp');}
+body.has-quest .stat-card:nth-child(3)::before {background-image:url('../img/rune-evidence.webp');}
+body.has-quest .stat-card:nth-child(4)::before {background-image:url('../img/rune-nuclei.webp');}
+body.has-quest .stat-card:nth-child(5)::before {background-image:url('../img/rune-runs.webp');}
+body.has-quest .stat-label {margin:0 0 2px;color:#cba9f6;font-size:10px;line-height:1.25;font-family:Georgia,serif;letter-spacing:.19em;text-transform:uppercase;}
+body.has-quest .stat-value {font-family:Georgia,serif;font-size:32px;font-weight:400;color:white;line-height:1.1;}
+
+/* Deep illustrated sections for all routes; nested controls still work normally. */
+body.has-quest .content>.panel,
+body.has-quest .content>.panel~.panel {
+  position:relative;margin:15px 0 0;padding:19px 21px 20px;
+  border:1px solid rgba(137,78,218,.6);border-radius:2px;
+  background:linear-gradient(145deg,rgba(8,8,24,.88),rgba(8,7,19,.76));
+  box-shadow:inset 0 0 0 4px rgba(5,4,14,.72),inset 0 0 0 5px rgba(145,81,210,.11);
+}
+body.has-quest .content>.panel::before {content:"✧";position:absolute;left:11px;top:-13px;color:#b879ff;font-size:18px;background:transparent;}
+body.has-quest .panel-header {margin-bottom:13px;}
+body.has-quest .panel-header h2 {color:#f1e8f8;font-size:22px;letter-spacing:.12em;font-weight:400;text-transform:uppercase;}
+body.has-quest .panel-header .muted {color:#bfb0d5;font-size:12px;}
+body.has-quest .content>.storage-sanctum {
+  min-height:136px;padding:17px 26px;
+  background:
+    linear-gradient(90deg,rgba(7,7,20,.97) 0%,rgba(7,7,20,.89) 60%,rgba(7,7,20,.35) 100%),
+    url('../img/arcane-storage.webp') right center / auto 100% no-repeat,
+    #080717;
+}
+body.has-quest .storage-sanctum .panel-header {margin-bottom:12px;align-items:center;}
+body.has-quest .storage-sanctum .panel-header h2 {padding-left:50px;}
+body.has-quest .storage-sanctum .panel-header h2::before {
+  content:"";position:absolute;margin-left:-53px;margin-top:-6px;
+  width:41px;height:41px;background:url('../img/rune-storage.webp') center / contain no-repeat;
+  filter:drop-shadow(0 0 8px #8b4ee4);
+}
+body.has-quest .storage-sanctum .panel-header .muted {padding-left:50px;}
+body.has-quest .storage-sanctum .mono {color:#c9b3e6;text-shadow:0 1px 4px #080717;}
+body.has-quest .storage-track {
+  display:block;height:13px;overflow:hidden;
+  border:1px solid #8553cd;border-radius:99px;
+  background:rgba(7,6,21,.85);box-shadow:inset 0 2px 4px black,0 0 10px rgba(120,75,191,.18);
+}
+body.has-quest .storage-fill {
+  height:100%;min-width:0;border-radius:99px;
+  background:linear-gradient(90deg,#7f33eb,#c26dff);
+  box-shadow:0 0 9px #9854ff;
+}
+body.has-quest .storage-caption {color:#c1aee0;letter-spacing:.01em;font-family:Georgia,serif;}
+
+/* Recon engine codex — artwork left, live engine metadata right. */
+body.has-quest .content>.engine-sanctum {
+  padding:13px 20px 17px;background:linear-gradient(180deg,rgba(6,6,20,.8),rgba(4,5,17,.92));
+}
+body.has-quest .engine-sanctum .panel-header {padding-left:48px;margin-bottom:12px;}
+body.has-quest .engine-sanctum .panel-header::before {
+  content:"";position:absolute;left:22px;top:13px;width:38px;height:38px;
+  background:url('../img/reconmancer-mark.webp') center / contain no-repeat;filter:drop-shadow(0 0 8px #7e43d4);
+}
+body.has-quest .engine-sanctum .panel-header h2 {font-size:18px;margin:2px 0;}
+body.has-quest .content .engine-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;border:0;}
+body.has-quest .content .engine-card {
+  position:relative;display:flex;flex-direction:column;justify-content:space-between;
+  min-height:149px;padding:14px 13px 12px clamp(106px,10vw,142px);
+  overflow:hidden;border:1px solid rgba(143,73,241,.73);border-radius:2px;
+  background:
+    linear-gradient(90deg,rgba(5,5,15,.05) 0%,rgba(5,5,17,.13) 28%,rgba(6,6,20,.95) 49%,rgba(6,6,18,.88) 100%),
+    var(--engine-art) left center / auto 100% no-repeat,
+    #08091c;
+  color:#f5eafa;box-shadow:inset 0 0 0 4px rgba(4,4,15,.78),0 1px 14px rgba(48,18,101,.22);
+  transform:none;transition:filter .15s,border-color .15s,background-color .15s;
+}
+body.has-quest .content .engine-card:nth-child(1) {--engine-art:url('../img/arcane-httpx.webp');}
+body.has-quest .content .engine-card:nth-child(2) {--engine-art:url('../img/arcane-katana.webp');}
+body.has-quest .content .engine-card:nth-child(3) {--engine-art:url('../img/arcane-nuclei.webp');}
+body.has-quest .content .engine-card::after {
+  content:"";position:absolute;inset:5px;pointer-events:none;border:1px solid rgba(149,83,225,.23);
+  background:
+    linear-gradient(90deg,#ad70ff,#ad70ff) left top / 20px 1px no-repeat,
+    linear-gradient(#ad70ff,#ad70ff) left top / 1px 20px no-repeat,
+    linear-gradient(270deg,#ad70ff,#ad70ff) right bottom / 20px 1px no-repeat,
+    linear-gradient(0deg,#ad70ff,#ad70ff) right bottom / 1px 20px no-repeat;
+}
+body.has-quest .content .engine-card:hover {filter:brightness(1.12);border-color:#c38aff;transform:translateY(-1px);}
+body.has-quest .engine-identity-icon {display:none;}
+body.has-quest .engine-identity {display:flex;gap:0;align-items:flex-start;min-width:0;}
+body.has-quest .engine-identity>div {min-width:0;}
+body.has-quest .engine-card-top {display:flex;align-items:flex-start;justify-content:space-between;gap:4px;}
+body.has-quest .engine-name {font-family:Georgia,serif;font-size:18px;font-weight:500;letter-spacing:.04em;line-height:1.2;margin:0 0 7px;color:#f3e7f9;}
+body.has-quest .engine-description {font-family:Georgia,serif;font-size:11px;line-height:1.45;color:#dbcee9;}
+body.has-quest .engine-state.ready {flex:0 0 auto;font-size:9px;letter-spacing:.06em;border:1px solid #236e73;padding:3px 5px;border-radius:4px;color:#62f9e6;background:rgba(5,38,44,.82);text-shadow:0 0 5px #287e81;}
+body.has-quest .engine-capabilities {margin:8px 0 0;gap:6px;}
+body.has-quest .engine-capabilities span {border:1px solid #6945af;border-radius:4px;padding:3px 6px;background:rgba(9,6,24,.87);font-size:10px;color:#ddc5f6;}
+
+/* Journal pages (HTTPX, Katana, Nuclei, analysis, evidence, findings ...). */
+body.has-quest:not(.realm-overview) .page-header {min-height:167px;padding-left:145px;}
+body.has-quest:not(.realm-overview) .page-header::before {left:26px;width:98px;height:98px;}
+body.has-quest[data-route*="/httpx/"] .page-header::before {background-image:url('../img/arcane-httpx.webp');}
+body.has-quest[data-route*="/katana/"] .page-header::before {background-image:url('../img/arcane-katana.webp');}
+body.has-quest[data-route*="/nuclei/"] .page-header::before {background-image:url('../img/arcane-nuclei.webp');}
+body.has-quest[data-route*="/findings/"] .page-header::before {background-image:url('../img/rune-findings.webp');}
+body.has-quest[data-route*="/analysis/"] .page-header::before {background-image:url('../img/rune-analysis.webp');}
+body.has-quest[data-route*="/evidence/"] .page-header::before {background-image:url('../img/rune-evidence.webp');}
+body.has-quest[data-route*="/runs/"] .page-header::before {background-image:url('../img/rune-runs.webp');}
+body.has-quest[data-route*="/jobs/"] .page-header::before {background-image:url('../img/rune-jobs.webp');}
+body.has-quest[data-route*="/storage/"] .page-header::before {background-image:url('../img/rune-storage.webp');}
+body.has-quest[data-route*="/settings/"] .page-header::before {background-image:url('../img/rune-settings.webp');}
+body.has-quest .table-wrap {max-width:100%;min-width:0;overflow-x:auto;border:1px solid rgba(112,67,177,.3);border-radius:2px;background:rgba(7,6,18,.71);}
+body.has-quest .data-table th {background:rgba(71,34,117,.19);color:#d8c1f0;font-family:Georgia,serif;letter-spacing:.1em;border-bottom:1px solid rgba(154,93,220,.4);}
+body.has-quest .data-table tbody tr:hover {background:rgba(104,50,181,.16);}
+body.has-quest .form-input,body.has-quest .target-input,body.has-quest textarea,body.has-quest select,body.has-quest input[type='text'] {
+  border-color:#473263;border-radius:3px;background-color:rgba(6,7,19,.86);color:#ede5f8;
+}
+body.has-quest .button,body.has-quest button.button {border:1px solid #8051c7;border-radius:3px;box-shadow:inset 0 1px 0 rgba(208,161,255,.14);}
+body.has-quest .button:hover {border-color:#bb7ef8;box-shadow:0 0 12px rgba(134,73,229,.2);}
+body.has-quest .panel .panel {background:rgba(12,9,28,.82);border-color:rgba(123,75,188,.33);}
+body.has-quest .visual-card img,body.has-quest .table-shot {object-fit:contain!important;object-position:50% 50%!important;}
+
+/* The registry is the antechamber: same world and gemstone panels, wider canvas. */
+body.registry-view .topbar {background:rgba(7,6,20,.92);border-color:rgba(131,65,217,.6);}
+body.registry-view .layout {min-height:calc(100vh - 76px);}
+body.registry-view .content {max-width:1430px;margin-inline:auto;padding:19px clamp(14px,3vw,46px) 80px;}
+body.registry-view .chapter-rule {border-bottom:1px solid rgba(128,73,201,.4);padding-bottom:14px;margin-bottom:17px;}
+body.registry-view .brand-hero {border:1px solid rgba(161,86,254,.85);background:#050511;padding:0;min-height:0;overflow:hidden;}
+body.registry-view .brand-hero::before,body.registry-view .brand-hero::after {display:none;}
+body.registry-view .brand-hero picture {display:block;}
+body.registry-view .brand-hero-image {aspect-ratio:1379 / 274;max-height:none;object-fit:contain;width:100%;height:auto;}
+body.registry-view .page-header {border-bottom:1px solid #643990;padding:15px 0 22px;}
+body.registry-view .page-header h1 {font-size:42px;letter-spacing:.035em;color:white;}
+body.registry-view .content>.panel {border:1px solid #623989;background:linear-gradient(110deg,rgba(12,8,29,.92),rgba(8,6,23,.83));padding:23px;border-radius:2px;box-shadow:inset 0 0 0 5px rgba(5,4,15,.57);}
+body.registry-view .content>.panel::before {background:transparent;}
+body.registry-view .project-grid {border-top:1px solid #6944a5;}
+body.registry-view .content .project-card-managed {border-bottom-color:#523571;padding:19px 10px;}
+body.registry-view .content .project-card-managed:hover {background:rgba(76,36,129,.25);}
+body.registry-view .project-card-copy h3 {color:#f1e7ff;}
+body.registry-view .button {border-radius:3px;}
+
+/* Responsive fidelity and accessibility: never crop the supplied banner. */
+@media(max-width:1400px) {
+  body.has-quest .content .engine-card {padding-left:98px;}
+  body.has-quest .stat-card {padding-left:65px;}
+  body.has-quest .stat-card::before {width:41px;height:41px;left:14px;}
+  body.has-quest .engine-state.ready {font-size:8px;}
+}
+@media(max-width:1120px) {
+  body.has-quest .sidebar {flex-basis:214px;width:214px;min-width:214px;padding-left:11px;}
+  body.has-quest .content {width:calc(100% - 214px);}
+  body.has-quest .sidebar-brand-type>span {font-size:21px;}
+  body.has-quest .quest-prophecy {display:none;}
+  body.has-quest .content .engine-grid {grid-template-columns:repeat(2,minmax(0,1fr));}
+  body.has-quest .content .engine-card {padding-left:123px;}
+  body.has-quest .stats-grid {grid-template-columns:repeat(5,minmax(0,1fr));}
+  body.has-quest .stat-card {padding-left:9px;text-align:center;}
+  body.has-quest .stat-card::before {position:relative;left:auto;top:auto;transform:none;margin:0 auto 7px;width:32px;height:32px;}
+}
+@media(max-width:850px) {
+  body.has-quest>.topbar {display:flex;background:rgba(6,6,19,.97);}
+  body.has-quest .layout {display:block;min-height:calc(100vh - 68px);}
+  body.has-quest .sidebar {
+    position:relative;display:flex;flex-wrap:nowrap;align-items:center;gap:2px;
+    top:auto;width:100%;min-width:0;height:auto;max-height:none;min-height:0;
+    overflow-x:auto;overflow-y:hidden;padding:9px 11px;
+    border:0;border-bottom:1px solid #56358c;
+    background:rgba(7,6,18,.97);
+  }
+  body.has-quest .sidebar::before,body.has-quest .nav-scene,body.has-quest .sidebar-brand,
+  body.has-quest .sidebar-registry,body.has-quest .sidebar .nav-divider {display:none;}
+  body.has-quest .sidebar .nav-item.nav-overview {display:flex;}
+  body.has-quest .sidebar .nav-item {flex:0 0 auto;min-height:38px;white-space:nowrap;margin:0 2px 0 0;padding:7px 10px;}
+  body.has-quest .sidebar .nav-divider+.nav-item {margin-top:0;}
+  body.has-quest .content {width:100%;padding:13px clamp(12px,3vw,22px) 65px;}
+  body.has-quest .page-header {padding-left:80px;min-height:104px;}
+  body.has-quest .page-header::before {left:13px;width:55px;height:55px;}
+  body.has-quest:not(.realm-overview) .page-header {min-height:120px;padding-left:90px;}
+  body.has-quest:not(.realm-overview) .page-header::before {left:13px;width:64px;height:64px;}
+}
+@media(max-width:680px) {
+  body.has-quest .brand-hero-image,body.registry-view .brand-hero-image {aspect-ratio:990 / 328;}
+  body.has-quest .page-header {padding:14px 15px 14px 66px;margin:12px 0;min-height:91px;}
+  body.has-quest .page-header::before {left:11px;width:47px;height:47px;}
+  body.has-quest .page-header h1 {font-size:clamp(21px,6vw,30px);}
+  body.has-quest .page-header p {font-size:11px;}
+  body.has-quest .page-header .status-pill {font-size:10px;padding:6px 8px;margin:7px 0 0;}
+  body.has-quest .page-header {flex-wrap:wrap;}
+  body.has-quest .page-header>div:first-child {min-width:0;max-width:100%;}
+  body.has-quest:not(.realm-overview) .page-header {padding-left:77px;min-height:116px;}
+  body.has-quest:not(.realm-overview) .page-header::before {width:52px;height:52px;}
+  body.has-quest .stats-grid {grid-template-columns:repeat(2,minmax(0,1fr));}
+  body.has-quest .stat-card {min-height:75px;border-bottom:1px solid rgba(121,74,179,.33);}
+  body.has-quest .stat-card:nth-child(even) {border-right:0;}
+  body.has-quest .stat-card:last-child {grid-column:span 2;min-height:62px;border-bottom:0;}
+  body.has-quest .stat-value {font-size:27px;}
+  body.has-quest .storage-sanctum .panel-header {flex-wrap:wrap;}
+  body.has-quest .content>.storage-sanctum {background:linear-gradient(90deg,rgba(7,7,20,.94),rgba(7,7,20,.70)),url('../img/arcane-storage.webp') right center/auto 100% no-repeat;}
+  body.has-quest .storage-sanctum .panel-header .mono {margin-left:50px;font-size:11px;}
+  body.has-quest .content .engine-grid {grid-template-columns:1fr;}
+  body.has-quest .content .engine-card {padding-left:clamp(123px,35vw,160px);min-height:156px;}
+  body.has-quest .content>.panel {padding:15px 12px;}
+  body.has-quest .engine-sanctum .panel-header::before {left:14px;top:14px;}
+  body.has-quest .panel-header h2 {font-size:18px;}
+  body.registry-view .page-header h1 {font-size:31px;}
+}
+@media(max-width:350px) {
+  body.has-quest .content .engine-card {padding-left:104px;}
+  body.has-quest .engine-name {font-size:16px;}
+  body.has-quest .engine-state.ready {font-size:7px;padding:2px;}
+  body.has-quest .engine-description {font-size:10px;}
+  body.has-quest .engine-capabilities span {font-size:9px;}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after {animation:none!important;transition:none!important;scroll-behavior:auto!important;}}

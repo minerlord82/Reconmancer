@@ -1,0 +1,551 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+{{ project.config.project.name }} · Reconmancer
+{% endblock %}
+
+
+{% block content %}
+
+<section class="brand-hero arcane-banner" aria-label="Reconmancer identity">
+    <picture>
+        <source media="(max-width: 680px)" srcset="{{ url_for('static', filename='img/arcane-banner-mobile.webp') }}">
+        <img class="brand-hero-image" src="{{ url_for('static', filename='img/arcane-banner.webp') }}" alt="Reconmancer: see further, uncover more. An arcane eye above a moonlit citadel." width="1379" height="274" decoding="async" fetchpriority="high">
+    </picture>
+</section>
+
+<div class="page-header quest-overview-header">
+
+    <div>
+
+        <div class="eyebrow">
+            QUEST OVERVIEW
+        </div>
+
+        <h1>
+            {{ project.config.project.name }}
+        </h1>
+
+        <p class="muted">
+            Reconnaissance workspace
+            ·
+            {{ project.config.project.slug }}
+        </p>
+
+    </div>
+
+
+    <div class="quest-prophecy" aria-hidden="true">
+        <em>Map the unseen.</em>
+        <span>From domains to infrastructure,</span>
+        <span>turn the internet into intelligence.</span>
+    </div>
+
+    <div class="status-pill">
+        Active Quest
+    </div>
+
+</div>
+
+
+<div class="ledger-label" aria-hidden="true">THE DISCOVERY LEDGER <span>✦</span> FIELD TOTALS</div>
+<div class="stats-grid">
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Assets
+        </span>
+
+        <strong class="stat-value">
+            {{ counts.assets }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            URLs
+        </span>
+
+        <strong class="stat-value">
+            {{ counts.urls }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Redirects
+        </span>
+
+        <strong class="stat-value">
+            {{ counts.redirects }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Discoveries
+        </span>
+
+        <strong class="stat-value">
+            {{ counts.discoveries }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Runs
+        </span>
+
+        <strong class="stat-value">
+            {{ counts.runs }}
+        </strong>
+
+    </div>
+
+
+</div>
+
+
+<section class="panel storage-sanctum">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Storage
+            </h2>
+
+            <p class="muted">
+                Project disk budget
+            </p>
+
+        </div>
+
+
+        <div class="mono muted">
+            {{ used_bytes|human_bytes }}
+            /
+            {{ limit_bytes|human_bytes }}
+        </div>
+
+    </div>
+
+
+    <div class="storage-track">
+
+        <div
+            class="storage-fill"
+            style="width: {{ storage_percentage }}%;"
+        ></div>
+
+    </div>
+
+
+    <div class="storage-caption">
+
+        {{ "%.2f"|format(storage_percentage) }}%
+        of the project storage budget is currently used.
+
+    </div>
+
+</section>
+
+
+<section class="panel engine-sanctum">
+
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Recon Engines
+            </h2>
+
+            <p class="muted">
+                Independent reconnaissance engines
+                available to this quest.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="engine-grid">
+
+
+        <a
+            class="engine-card engine-available"
+            href="/p/{{ project.config.project.slug }}/httpx/"
+        >
+
+            <div class="engine-card-top">
+
+                <div class="engine-identity">
+
+                    <img
+                        class="engine-identity-icon"
+                        src="{{ url_for('static', filename='img/icon-httpx.webp') }}"
+                        alt=""
+                        width="35"
+                        height="35"
+                    >
+
+                    <div>
+                        <div class="engine-name">HTTPX</div>
+                        <div class="engine-description">
+                            HTTP probing, metadata, fingerprints, redirects and visual reconnaissance.
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <span class="engine-state ready">
+                    READY
+                </span>
+
+            </div>
+
+
+            <div class="engine-capabilities">
+
+                <span>
+                    Metadata
+                </span>
+
+                <span>
+                    Redirects
+                </span>
+
+                <span>
+                    Screenshots
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <a
+            class="engine-card engine-available"
+            href="/p/{{ project.config.project.slug }}/katana/"
+        >
+
+            <div class="engine-card-top">
+
+                <div class="engine-identity">
+
+                    <img
+                        class="engine-identity-icon"
+                        src="{{ url_for('static', filename='img/icon-katana.webp') }}"
+                        alt=""
+                        width="35"
+                        height="35"
+                    >
+
+                    <div>
+                        <div class="engine-name">Katana</div>
+                        <div class="engine-description">
+                            Endpoint crawling, JavaScript, rendered DOM, forms and runtime request discovery.
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <span class="engine-state ready">
+                    READY
+                </span>
+
+            </div>
+
+
+            <div class="engine-capabilities">
+
+                <span>
+                    Standard
+                </span>
+
+                <span>
+                    Headless
+                </span>
+
+                <span>
+                    Deep
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <a
+            class="engine-card engine-available"
+            href="/p/{{ project.config.project.slug }}/nuclei/"
+        >
+
+            <div class="engine-card-top">
+
+                <div class="engine-identity">
+
+                    <img
+                        class="engine-identity-icon"
+                        src="{{ url_for('static', filename='img/icon-nuclei.webp') }}"
+                        alt=""
+                        width="35"
+                        height="35"
+                    >
+
+                    <div>
+                        <div class="engine-name">Nuclei</div>
+                        <div class="engine-description">
+                            Template-driven vulnerability and exposure detection with normalized findings.
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <span class="engine-state ready">
+                    READY
+                </span>
+
+            </div>
+
+
+            <div class="engine-capabilities">
+
+                <span>
+                    Findings
+                </span>
+
+                <span>
+                    Severity
+                </span>
+
+                <span>
+                    Evidence
+                </span>
+
+            </div>
+
+        </a>
+
+
+    </div>
+
+
+</section>
+
+
+<style>
+
+.engine-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(
+                250px,
+                1fr
+            )
+        );
+
+    gap: 14px;
+}
+
+
+.engine-card {
+    display: block;
+
+    padding: 18px;
+
+    border:
+        1px solid rgba(77, 68, 105, 0.58);
+
+    border-radius: 11px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(18, 21, 32, 0.96),
+            rgba(12, 15, 22, 0.96)
+        );
+
+    text-decoration: none;
+
+    color: inherit;
+
+    transition:
+        transform 120ms ease,
+        border-color 120ms ease,
+        background 120ms ease;
+}
+
+
+.engine-available:hover {
+    transform:
+        translateY(-2px);
+
+    border-color:
+        rgba(
+            124,
+            77,
+            255,
+            0.55
+        );
+
+    background:
+        rgba(
+            124,
+            77,
+            255,
+            0.06
+        );
+}
+
+
+.engine-card-top {
+    display: flex;
+
+    justify-content:
+        space-between;
+
+    gap: 14px;
+}
+
+
+.engine-name {
+    margin-bottom: 8px;
+
+    font-size: 17px;
+
+    font-family: Georgia, "Times New Roman", serif;
+
+    font-weight: 600;
+}
+
+
+.engine-description {
+    color: var(--muted);
+
+    font-size: 12px;
+
+    line-height: 1.55;
+}
+
+
+.engine-state {
+    height: fit-content;
+
+    padding:
+        4px 7px;
+
+    border-radius: 6px;
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: .08em;
+}
+
+
+.engine-state.ready {
+    background:
+        rgba(
+            45,
+            212,
+            191,
+            0.10
+        );
+
+    color:
+        #65e1cf;
+}
+
+
+.engine-capabilities {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 7px;
+
+    margin-top: 16px;
+}
+
+
+.engine-capabilities span {
+    padding:
+        4px 7px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 6px;
+
+    color: var(--muted);
+
+    font-size: 10px;
+}
+
+
+.storage-track {
+    overflow: hidden;
+
+    height: 8px;
+
+    border-radius: 999px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.05
+        );
+}
+
+
+.storage-fill {
+    height: 100%;
+
+    border-radius: inherit;
+
+    background:
+        var(--accent);
+}
+
+
+.storage-caption {
+    margin-top: 9px;
+
+    color: var(--muted);
+
+    font-size: 11px;
+}
+
+</style>
+
+
+{% endblock %}

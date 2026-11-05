@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Jobs · {{ project.config.project.name }}{% endblock %}
+{% block content %}
+<div class="page-header"><div><div class="eyebrow">WORKER RELIABILITY</div><h1>Jobs</h1><p class="muted">Heartbeat monitoring, stale-worker recovery and retries.</p></div><form method="post" action="/p/{{ project.config.project.slug }}/jobs/recover/"><button class="button secondary" type="submit">Run Recovery Check</button></form></div>
+{% if message %}<div class="settings-message">{{ message }}</div>{% endif %}{% if error %}<div class="settings-error">{{ error }}</div>{% endif %}
+<section class="panel">
+  <div class="panel-header"><div><h2>Worker Queue</h2><p class="muted">This page automatically performs a stale-job check. Last check inspected {{ recovery.checked }} active job(s).</p></div></div>
+  <form method="get" class="workflow-filter-grid"><select class="form-input" name="status"><option value="">All statuses</option>{% for value in ['queued','running','completed','failed','interrupted'] %}<option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ value }}</option>{% endfor %}</select><button class="button secondary" type="submit">Filter</button></form>
+  <div class="table-wrap"><table class="data-table"><thead><tr><th>Job</th><th>Engine</th><th>State</th><th>Attempt</th><th>Run</th><th>Heartbeat</th><th>Source</th><th>Error</th><th></th></tr></thead><tbody>
+  {% for item in jobs %}<tr><td class="mono">{{ item.id }}</td><td>{{ item.engine|upper }}</td><td><span class="job-state job-state-{{ item.health }}">{{ item.health|upper }}</span></td><td>{{ item.attempt or 1 }}</td><td class="mono">{{ item.run_id or '—' }}</td><td class="mono">{{ item.heartbeat_at or '—' }}</td><td class="mono">{{ item.retry_of or '—' }}</td><td class="workflow-error">{{ item.error or '—' }}</td><td>{% if item.status in ['failed','interrupted','stale'] %}<form method="post" action="/p/{{ project.config.project.slug }}/jobs/{{ item.id }}/retry/"><button class="button secondary" type="submit">Retry</button></form>{% endif %}</td></tr>{% else %}<tr><td colspan="9" class="muted">No jobs yet.</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endblock %}

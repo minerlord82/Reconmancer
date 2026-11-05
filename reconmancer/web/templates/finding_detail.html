@@ -1,0 +1,719 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+{{ finding.id }} · Reconmancer
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="page-header">
+
+    <div>
+
+        <div class="eyebrow">
+            BUG BOUNTY FINDING
+        </div>
+
+        <h1>
+            {{ finding.id }}
+            ·
+            {{ finding.title }}
+        </h1>
+
+        <p class="muted">
+            Evidence, provenance and analyst notes.
+        </p>
+
+    </div>
+
+
+    <a
+        class="button secondary"
+        href="/p/{{ project.config.project.slug }}/findings/"
+    >
+        Back
+    </a>
+
+</div>
+
+
+{% if message %}
+<div class="findings-message">
+    {{ message }}
+</div>
+{% endif %}
+
+
+{% if error %}
+<div class="findings-error">
+    {{ error }}
+</div>
+{% endif %}
+
+
+<section class="panel">
+
+    <form
+        method="post"
+        action="/p/{{ project.config.project.slug }}/findings/{{ finding.id }}/save/"
+    >
+
+        <div class="finding-editor-grid">
+
+            <div class="wide">
+
+                <label class="form-label">
+                    Title
+                </label>
+
+                <input
+                    class="form-input"
+                    name="title"
+                    value="{{ finding.title }}"
+                    required
+                >
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Severity
+                </label>
+
+                <select
+                    class="form-input"
+                    name="severity"
+                >
+
+                    {% for value in ["info", "low", "medium", "high", "critical"] %}
+
+                    <option
+                        value="{{ value }}"
+                        {% if finding.severity == value %}
+                        selected
+                        {% endif %}
+                    >
+                        {{ value|capitalize }}
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Status
+                </label>
+
+                <select
+                    class="form-input"
+                    name="status"
+                >
+
+                    {% for value in [
+                        "draft",
+                        "triage",
+                        "confirmed",
+                        "reported",
+                        "resolved",
+                        "duplicate",
+                        "not-applicable"
+                    ] %}
+
+                    <option
+                        value="{{ value }}"
+                        {% if finding.status == value %}
+                        selected
+                        {% endif %}
+                    >
+                        {{ value }}
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Host
+                </label>
+
+                <input
+                    class="form-input"
+                    name="host"
+                    value="{{ finding.host or '' }}"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label class="form-label">
+                    Primary URL
+                </label>
+
+                <input
+                    class="form-input"
+                    name="url"
+                    value="{{ finding.url or '' }}"
+                >
+
+            </div>
+
+
+            <div class="wide">
+
+                <label class="form-label">
+                    Description
+                </label>
+
+                <textarea
+                    class="form-input finding-textarea"
+                    name="description"
+                >{{ finding.description or '' }}</textarea>
+
+            </div>
+
+
+            <div class="wide">
+
+                <label class="form-label">
+                    Steps to reproduce
+                </label>
+
+                <textarea
+                    class="form-input finding-textarea"
+                    name="reproduction"
+                >{{ finding.reproduction or '' }}</textarea>
+
+            </div>
+
+
+            <div class="wide">
+
+                <label class="form-label">
+                    Impact
+                </label>
+
+                <textarea
+                    class="form-input finding-textarea"
+                    name="impact"
+                >{{ finding.impact or '' }}</textarea>
+
+            </div>
+
+
+            <div class="wide">
+
+                <label class="form-label">
+                    Remediation
+                </label>
+
+                <textarea
+                    class="form-input finding-textarea"
+                    name="remediation"
+                >{{ finding.remediation or '' }}</textarea>
+
+            </div>
+
+        </div>
+
+
+        <button
+            class="button scan-button"
+            type="submit"
+        >
+            Save Finding
+        </button>
+
+    </form>
+
+</section>
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+            <h2>Tags</h2>
+        </div>
+
+    </div>
+
+
+    <div class="finding-tag-list">
+
+        {% for tag in finding.tags %}
+
+        <form
+            method="post"
+            action="/p/{{ project.config.project.slug }}/findings/{{ finding.id }}/tag/remove/"
+        >
+
+            <input
+                type="hidden"
+                name="tag"
+                value="{{ tag }}"
+            >
+
+            <button
+                class="finding-tag"
+                type="submit"
+                title="Remove tag"
+            >
+                {{ tag }}
+                ×
+            </button>
+
+        </form>
+
+        {% endfor %}
+
+    </div>
+
+
+    <form
+        method="post"
+        class="findings-inline-form"
+        action="/p/{{ project.config.project.slug }}/findings/{{ finding.id }}/tag/"
+    >
+
+        <input
+            class="form-input"
+            name="tag"
+            placeholder="idor, account-takeover, api..."
+            required
+        >
+
+        <button
+            class="button secondary"
+            type="submit"
+        >
+            Add Tag
+        </button>
+
+    </form>
+
+</section>
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Linked Sources
+            </h2>
+
+            <p class="muted">
+                Provenance back to the original Reconmancer records.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if finding.sources %}
+
+    <div class="table-wrap">
+
+        <table class="data-table">
+
+            <thead>
+            <tr>
+                <th>Engine</th>
+                <th>Run</th>
+                <th>Host / URL</th>
+                <th>Observation</th>
+                <th>Evidence</th>
+                <th></th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+            {% for source in finding.sources %}
+
+            <tr>
+
+                <td>
+                    {{ source.source_engine|upper }}
+                </td>
+
+                <td class="mono">
+                    {{ source.source_run_id }}
+                </td>
+
+                <td>
+
+                    <div class="mono">
+                        {{ source.host or "—" }}
+                    </div>
+
+                    <div class="muted source-url">
+                        {{ source.url or "—" }}
+                    </div>
+
+                </td>
+
+                <td>
+                    {{ source.label or "Source record" }}
+                </td>
+
+                <td>
+
+                    <form
+                        method="post"
+                        action="/p/{{ project.config.project.slug }}/findings/{{ finding.id }}/source/{{ source.id }}/snapshot/"
+                    >
+
+                        <button
+                            class="button secondary"
+                            type="submit"
+                        >
+                            Snapshot
+                        </button>
+
+                    </form>
+
+                </td>
+
+                <td>
+
+                    <form
+                        method="post"
+                        action="/p/{{ project.config.project.slug }}/findings/{{ finding.id }}/source/{{ source.id }}/remove/"
+                    >
+
+                        <button
+                            class="button secondary"
+                            type="submit"
+                        >
+                            Unlink
+                        </button>
+
+                    </form>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {% endif %}
+
+
+    {% if available_pins %}
+
+    <form
+        method="post"
+        class="findings-inline-form"
+        action="/p/{{ project.config.project.slug }}/findings/{{ finding.id }}/source/add/"
+    >
+
+        <select
+            class="form-input"
+            name="pin_id"
+            required
+        >
+
+            <option value="">
+                Add pinned source…
+            </option>
+
+            {% for pin in available_pins %}
+
+            <option value="{{ pin.id }}">
+
+                {{ pin.source_engine|upper }}
+                {{ pin.source_run_id }}
+                ·
+                {{ pin.host or pin.url or pin.summary }}
+
+            </option>
+
+            {% endfor %}
+
+        </select>
+
+        <button
+            class="button secondary"
+            type="submit"
+        >
+            Link
+        </button>
+
+    </form>
+
+    {% endif %}
+
+</section>
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Evidence Vault
+            </h2>
+
+            <p class="muted">
+                Immutable SHA-256 content-addressed evidence.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if finding.evidence %}
+
+    <div class="table-wrap">
+
+        <table class="data-table">
+
+            <thead>
+            <tr>
+                <th>Kind</th>
+                <th>Label</th>
+                <th>SHA-256</th>
+                <th>Size</th>
+                <th></th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+            {% for evidence in finding.evidence %}
+
+            <tr>
+
+                <td>
+                    {{ evidence.kind }}
+                </td>
+
+                <td>
+                    {{ evidence.label or "Evidence" }}
+                </td>
+
+                <td class="evidence-hash">
+                    {{ evidence.evidence_hash }}
+                </td>
+
+                <td>
+                    {{ evidence.size_bytes|human_bytes }}
+                </td>
+
+                <td>
+
+                    <a
+                        class="button secondary"
+                        href="/p/{{ project.config.project.slug }}/findings/{{ finding.id }}/evidence/{{ evidence.id }}/"
+                        target="_blank"
+                    >
+                        View
+                    </a>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {% endif %}
+
+
+    <div class="findings-subpanel">
+
+        <h3>
+            Add manual evidence
+        </h3>
+
+        <p class="muted">
+            Useful for request/response fragments,
+            reproduction output or investigator notes.
+            Common authentication headers are automatically redacted.
+        </p>
+
+        <form
+            method="post"
+            action="/p/{{ project.config.project.slug }}/findings/{{ finding.id }}/evidence/manual/"
+        >
+
+            <label class="form-label">
+                Label
+            </label>
+
+            <input
+                class="form-input"
+                name="label"
+                placeholder="Unauthorized invoice response"
+            >
+
+
+            <label class="form-label">
+                Evidence
+            </label>
+
+            <textarea
+                class="form-input finding-textarea"
+                name="body"
+                required
+            ></textarea>
+
+
+            <button
+                class="button secondary"
+                type="submit"
+            >
+                Preserve Evidence
+            </button>
+
+        </form>
+
+    </div>
+
+</section>
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+            <h2>Analyst Notes</h2>
+        </div>
+
+    </div>
+
+
+    <form
+        method="post"
+        action="/p/{{ project.config.project.slug }}/findings/{{ finding.id }}/note/"
+    >
+
+        <textarea
+            class="form-input finding-textarea"
+            name="body"
+            placeholder="What did you test? What changed? What still needs verification?"
+            required
+        ></textarea>
+
+        <button
+            class="button secondary"
+            type="submit"
+        >
+            Add Note
+        </button>
+
+    </form>
+
+
+    {% for note in finding.notes %}
+
+    <div class="finding-note">
+
+        {{ note.body }}
+
+        <div class="muted">
+            {{ note.created_at }}
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+</section>
+
+
+<section class="panel finding-danger">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Archive
+            </h2>
+
+            <p class="muted">
+                Archiving hides the finding from the active list.
+                Linked evidence remains preserved.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if finding.archived %}
+
+    <form
+        method="post"
+        action="/p/{{ project.config.project.slug }}/findings/{{ finding.id }}/restore/"
+    >
+
+        <button
+            class="button secondary"
+            type="submit"
+        >
+            Restore Finding
+        </button>
+
+    </form>
+
+    {% else %}
+
+    <form
+        method="post"
+        action="/p/{{ project.config.project.slug }}/findings/{{ finding.id }}/archive/"
+    >
+
+        <button
+            class="button secondary"
+            type="submit"
+        >
+            Archive Finding
+        </button>
+
+    </form>
+
+    {% endif %}
+
+</section>
+
+
+{% endblock %}

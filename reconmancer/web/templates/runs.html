@@ -1,0 +1,927 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Runs · {{ project.config.project.name }}
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="page-header">
+
+    <div>
+
+        <div class="eyebrow">
+            QUEST ACTIVITY
+        </div>
+
+        <h1>
+            Runs
+        </h1>
+
+        <p class="muted">
+            Unified history for HTTPX, Katana,
+            Nuclei, background jobs and engine
+            handoffs.
+        </p>
+
+    </div>
+
+
+    <div class="status-pill">
+        {{ workspace.counts.active_jobs }}
+        active
+    </div>
+
+</div>
+
+
+<div class="stats-grid">
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Runs
+        </span>
+
+        <strong class="stat-value">
+            {{ workspace.counts.runs }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Jobs
+        </span>
+
+        <strong class="stat-value">
+            {{ workspace.counts.jobs }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Handoffs
+        </span>
+
+        <strong class="stat-value">
+            {{ workspace.counts.handoffs }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Active Jobs
+        </span>
+
+        <strong class="stat-value">
+            {{ workspace.counts.active_jobs }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span class="stat-label">
+            Failed Runs
+        </span>
+
+        <strong class="stat-value">
+            {{ workspace.counts.failed_runs }}
+        </strong>
+
+    </div>
+
+
+</div>
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Activity Timeline
+            </h2>
+
+            <p class="muted">
+                Newest events first.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if workspace.timeline %}
+
+
+    <div class="timeline-list">
+
+
+        {% for event in workspace.timeline %}
+
+
+        <div class="timeline-row">
+
+
+            <div class="timeline-marker">
+
+                <span class="event-type event-{{ event.kind }}">
+                    {{ event.kind|upper }}
+                </span>
+
+            </div>
+
+
+            <div class="timeline-main">
+
+
+                <div class="timeline-heading">
+
+
+                    {% if event.kind == "run" %}
+
+                        {% if event.engine == "httpx" %}
+
+                        <a
+                            class="table-link timeline-id"
+                            href="/p/{{ project.config.project.slug }}/httpx/run/{{ event.run_id }}/"
+                        >
+                            {{ event.id }}
+                        </a>
+
+                        {% elif event.engine == "katana" %}
+
+                        <a
+                            class="table-link timeline-id"
+                            href="/p/{{ project.config.project.slug }}/katana/run/{{ event.run_id }}/"
+                        >
+                            {{ event.id }}
+                        </a>
+
+                        {% elif event.engine == "nuclei" %}
+
+                        <a
+                            class="table-link timeline-id"
+                            href="/p/{{ project.config.project.slug }}/nuclei/run/{{ event.run_id }}/"
+                        >
+                            {{ event.id }}
+                        </a>
+
+                        {% else %}
+
+                        <span class="timeline-id">
+                            {{ event.id }}
+                        </span>
+
+                        {% endif %}
+
+
+                    {% else %}
+
+                    <span class="timeline-id mono">
+                        {{ event.id }}
+                    </span>
+
+                    {% endif %}
+
+
+                    {% if event.engine %}
+
+                    <span class="engine-badge engine-{{ event.engine }}">
+                        {{ event.engine|upper }}
+                    </span>
+
+                    {% endif %}
+
+
+                    <span
+                        class="run-status status-{{ event.status }}"
+                    >
+                        {{ event.status }}
+                    </span>
+
+
+                </div>
+
+
+                {% if event.kind == "handoff" %}
+
+                <div class="relationship">
+
+                    <span class="engine-badge engine-{{ event.source_engine }}">
+                        {{ event.source_engine|upper }}
+                    </span>
+
+                    {% if event.source_run_id %}
+
+                    <span class="mono">
+                        {{ event.source_run_id }}
+                    </span>
+
+                    {% endif %}
+
+                    <span class="relation-arrow">
+                        →
+                    </span>
+
+                    <span class="engine-badge engine-{{ event.destination_engine }}">
+                        {{ event.destination_engine|upper }}
+                    </span>
+
+                    {% if event.destination_run_id %}
+
+                        {% if event.destination_engine == "httpx" %}
+
+                        <a
+                            class="table-link mono"
+                            href="/p/{{ project.config.project.slug }}/httpx/run/{{ event.destination_run_id }}/"
+                        >
+                            {{ event.destination_run_id }}
+                        </a>
+
+                        {% elif event.destination_engine == "katana" %}
+
+                        <a
+                            class="table-link mono"
+                            href="/p/{{ project.config.project.slug }}/katana/run/{{ event.destination_run_id }}/"
+                        >
+                            {{ event.destination_run_id }}
+                        </a>
+
+                        {% elif event.destination_engine == "nuclei" %}
+
+                        <a
+                            class="table-link mono"
+                            href="/p/{{ project.config.project.slug }}/nuclei/run/{{ event.destination_run_id }}/"
+                        >
+                            {{ event.destination_run_id }}
+                        </a>
+
+                        {% endif %}
+
+                    {% endif %}
+
+                </div>
+
+
+                {% elif event.source_engine and event.source_run_id %}
+
+                <div class="relationship">
+
+                    <span class="muted">
+                        from
+                    </span>
+
+                    <span class="engine-badge engine-{{ event.source_engine }}">
+                        {{ event.source_engine|upper }}
+                    </span>
+
+                    <span class="mono">
+                        {{ event.source_run_id }}
+                    </span>
+
+                </div>
+
+                {% endif %}
+
+
+                <div class="timeline-metadata">
+
+                    {% if event.profile %}
+
+                    <span>
+                        profile:
+                        <strong>
+                            {{ event.profile }}
+                        </strong>
+                    </span>
+
+                    {% endif %}
+
+
+                    {% if event.input_count is not none %}
+
+                    <span>
+                        inputs:
+                        <strong>
+                            {{ event.input_count }}
+                        </strong>
+                    </span>
+
+                    {% endif %}
+
+
+                    {% if event.result_count is not none %}
+
+                    <span>
+                        results:
+                        <strong>
+                            {{ event.result_count }}
+                        </strong>
+                    </span>
+
+                    {% endif %}
+
+
+                    {% if event.duration != "—" %}
+
+                    <span>
+                        duration:
+                        <strong>
+                            {{ event.duration }}
+                        </strong>
+                    </span>
+
+                    {% endif %}
+
+
+                    {% if event.time %}
+
+                    <span class="mono">
+                        {{ event.time }}
+                    </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                {% if event.error %}
+
+                <div class="event-error">
+                    {{ event.error }}
+                </div>
+
+                {% endif %}
+
+
+            </div>
+
+
+        </div>
+
+
+        {% endfor %}
+
+
+    </div>
+
+
+    {% else %}
+
+
+    <div class="empty-state">
+
+        <h2>
+            No activity yet
+        </h2>
+
+        <p>
+            Engine jobs and runs will appear here.
+        </p>
+
+    </div>
+
+
+    {% endif %}
+
+
+</section>
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Engine Runs
+            </h2>
+
+            <p class="muted">
+                One row per completed, running or
+                failed engine execution.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if workspace.runs %}
+
+
+    <div class="table-wrap">
+
+        <table class="data-table">
+
+            <thead>
+
+            <tr>
+
+                <th>Run</th>
+                <th>Engine</th>
+                <th>Profile</th>
+                <th>Status</th>
+                <th>Source</th>
+                <th>Inputs</th>
+                <th>Results</th>
+                <th>Duration</th>
+                <th>Downstream</th>
+                <th>Started</th>
+
+            </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+            {% for run in workspace.runs %}
+
+
+            <tr>
+
+
+                <td class="mono">
+
+                    {% if run.engine == "httpx" %}
+
+                    <a
+                        class="table-link"
+                        href="/p/{{ project.config.project.slug }}/httpx/run/{{ run.id }}/"
+                    >
+                        {{ run.id }}
+                    </a>
+
+                    {% elif run.engine == "katana" %}
+
+                    <a
+                        class="table-link"
+                        href="/p/{{ project.config.project.slug }}/katana/run/{{ run.id }}/"
+                    >
+                        {{ run.id }}
+                    </a>
+
+                    {% elif run.engine == "nuclei" %}
+
+                    <a
+                        class="table-link"
+                        href="/p/{{ project.config.project.slug }}/nuclei/run/{{ run.id }}/"
+                    >
+                        {{ run.id }}
+                    </a>
+
+                    {% else %}
+
+                        {{ run.id }}
+
+                    {% endif %}
+
+                </td>
+
+
+                <td>
+
+                    <span class="engine-badge engine-{{ run.engine }}">
+                        {{ run.engine|upper }}
+                    </span>
+
+                </td>
+
+
+                <td>
+                    {{ run.profile or "—" }}
+                </td>
+
+
+                <td>
+
+                    <span class="run-status status-{{ run.status }}">
+                        {{ run.status }}
+                    </span>
+
+                </td>
+
+
+                <td>
+
+                    {% if run.source_engine and run.source_run_id %}
+
+                    <span class="source-relation">
+
+                        <span class="engine-badge engine-{{ run.source_engine }}">
+                            {{ run.source_engine|upper }}
+                        </span>
+
+                        <span class="mono">
+                            {{ run.source_run_id }}
+                        </span>
+
+                    </span>
+
+                    {% else %}
+
+                    <span class="muted">
+                        Manual
+                    </span>
+
+                    {% endif %}
+
+                </td>
+
+
+                <td>
+                    {{ run.input_count or 0 }}
+                </td>
+
+
+                <td>
+                    {{ run.result_count or 0 }}
+                </td>
+
+
+                <td class="mono">
+                    {{ run.duration }}
+                </td>
+
+
+                <td>
+
+                    {% if run.downstream_handoffs %}
+
+                        {% for handoff in run.downstream_handoffs %}
+
+                        <div class="downstream-item">
+
+                            <span class="relation-arrow">
+                                →
+                            </span>
+
+                            <span class="engine-badge engine-{{ handoff.destination_engine }}">
+                                {{ handoff.destination_engine|upper }}
+                            </span>
+
+                            {% if handoff.destination_run_id %}
+
+                            <span class="mono">
+                                {{ handoff.destination_run_id }}
+                            </span>
+
+                            {% endif %}
+
+                        </div>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                    <span class="muted">
+                        —
+                    </span>
+
+                    {% endif %}
+
+                </td>
+
+
+                <td class="mono muted">
+                    {{ run.started_at }}
+                </td>
+
+
+            </tr>
+
+
+            {% if run.error %}
+
+            <tr class="error-detail-row">
+
+                <td colspan="10">
+
+                    <div class="event-error">
+                        {{ run.error }}
+                    </div>
+
+                </td>
+
+            </tr>
+
+            {% endif %}
+
+
+            {% endfor %}
+
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    {% endif %}
+
+
+</section>
+
+
+<style>
+
+.timeline-list {
+    display: flex;
+
+    flex-direction: column;
+}
+
+
+.timeline-row {
+    display: grid;
+
+    grid-template-columns:
+        86px 1fr;
+
+    gap: 14px;
+
+    padding:
+        15px 0;
+
+    border-bottom:
+        1px solid var(--border);
+}
+
+
+.timeline-row:last-child {
+    border-bottom: 0;
+}
+
+
+.timeline-marker {
+    padding-top: 2px;
+}
+
+
+.event-type {
+    display: inline-block;
+
+    min-width: 64px;
+
+    padding:
+        5px 7px;
+
+    border-radius: 6px;
+
+    text-align: center;
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: .07em;
+}
+
+
+.event-run {
+    background:
+        rgba(
+            152,
+            119,
+            255,
+            .13
+        );
+
+    color:
+        #c8b7ff;
+}
+
+
+.event-job {
+    background:
+        rgba(
+            80,
+            180,
+            255,
+            .11
+        );
+
+    color:
+        #8dcfff;
+}
+
+
+.event-handoff {
+    background:
+        rgba(
+            255,
+            180,
+            70,
+            .11
+        );
+
+    color:
+        #ffd180;
+}
+
+
+.timeline-heading {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    align-items: center;
+
+    gap: 8px;
+}
+
+
+.timeline-id {
+    font-weight: 700;
+}
+
+
+.timeline-metadata {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap:
+        8px 18px;
+
+    margin-top: 8px;
+
+    color: var(--muted);
+
+    font-size: 11px;
+}
+
+
+.relationship {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    align-items: center;
+
+    gap: 7px;
+
+    margin-top: 9px;
+
+    font-size: 11px;
+}
+
+
+.relation-arrow {
+    color:
+        var(--muted);
+}
+
+
+.engine-badge {
+    display: inline-block;
+
+    padding:
+        3px 6px;
+
+    border-radius: 5px;
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: .04em;
+}
+
+
+.engine-httpx {
+    background:
+        rgba(
+            90,
+            175,
+            255,
+            .11
+        );
+
+    color:
+        #8bcaff;
+}
+
+
+.engine-katana {
+    background:
+        rgba(
+            155,
+            115,
+            255,
+            .12
+        );
+
+    color:
+        #c5adff;
+}
+
+
+.engine-nuclei {
+    background:
+        rgba(
+            255,
+            150,
+            70,
+            .11
+        );
+
+    color:
+        #ffb078;
+}
+
+
+.event-error {
+    margin-top: 10px;
+
+    padding: 9px;
+
+    border:
+        1px solid
+        rgba(
+            255,
+            80,
+            100,
+            .25
+        );
+
+    border-radius: 6px;
+
+    background:
+        rgba(
+            255,
+            80,
+            100,
+            .05
+        );
+
+    color:
+        #ff9aa9;
+
+    font-family:
+        "SFMono-Regular",
+        Consolas,
+        monospace;
+
+    font-size: 10px;
+
+    overflow-wrap: anywhere;
+}
+
+
+.source-relation,
+.downstream-item {
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+}
+
+
+.downstream-item
++ .downstream-item {
+    margin-top: 5px;
+}
+
+
+.error-detail-row td {
+    padding-top: 0;
+}
+
+
+@media(max-width: 700px) {
+
+    .timeline-row {
+        grid-template-columns:
+            1fr;
+    }
+
+}
+
+</style>
+
+
+{% endblock %}
