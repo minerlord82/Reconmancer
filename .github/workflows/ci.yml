@@ -10,14 +10,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-      - name: Install dependencies
+
+      - name: Run full installation
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          chmod +x install.sh
+          sudo ./install.sh
+
       - name: Run self-check script
-        run: python scripts/reconmancer_selfcheck.py
+        run: |
+          cd /opt/reconmancer
+          source venv/bin/activate
+          python -m scripts.reconmancer_selfcheck
