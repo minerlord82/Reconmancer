@@ -1,6 +1,5 @@
 # Reconmancer
 
-[![CI](https://github.com/minerlord82/Reconmancer/actions/workflows/ci.yml/badge.svg)](https://github.com/minerlord82/Reconmancer/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Reconmancer is a lightweight web workspace for **authorized bug-bounty reconnaissance**. It coordinates ProjectDiscovery HTTPX, Katana, and Nuclei while keeping raw output, normalized SQLite data, redirect relationships, handoff provenance, evidence, findings, and analysis state isolated per project.
