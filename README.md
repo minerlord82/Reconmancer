@@ -164,17 +164,3 @@ Authentication profiles are stored inside project runtime data and must never be
 The Storage page can remove collected scan/investigation data while preserving project configuration, the project's target file, and authentication profiles.
 
 Deleting a project removes that complete project directory. Active-job checks are used before destructive project operations.
-
-## Source-release hygiene
-
-A public/source archive should not contain:
-
-- `config/tools.yaml`
-- `venv/`
-- project directories or SQLite databases
-- auth profiles, cookies, API keys, or `.env` files
-- raw scan output, screenshots, evidence, logs, or temporary files
-- the managed `nuclei-templates` checkout
-- Python caches or locally generated archives
-
-The supplied `.gitignore` is configured around those rules.
