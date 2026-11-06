@@ -123,7 +123,7 @@ The repository `.gitignore` excludes project directories from source control.
 
 Reconmancer v0.1.4 introduces **The Arcane Atlas**, a panoramic illustrated UI inspired by the supplied concept screenshot. A full-screen local WebP fantasy landscape replaces the flat page background; the sidebar shows a moonlit fortress scene; overview statistics appear in a rune-framed ledger; storage has a lantern scene; and HTTPX/Katana/Nuclei have distinct illustrated panels. Secondary pages inherit the same sidebar, scenic page headers, carved panel borders and responsive layout. The top banner uses a non-cropping image. At narrow widths, a separate mobile banner preserves readability.
 
-Only the shared `base.html`, the landing and overview templates, a new CSS layer, and local lightweight art assets are required for this change. **No Python engine, worker, scan command, Flask route, persistence, or existing JavaScript source is changed.** See `REDESIGN_v0.1.4.md` for the exact file list and upgrade instructions.
+Only the shared `base.html`, the landing and overview templates, a new CSS layer, and local lightweight art assets are required for this change. **No Python engine, worker, scan command, Flask route, persistence, or existing JavaScript source is changed.
 
 ## Screenshots
 
