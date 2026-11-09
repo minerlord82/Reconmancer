@@ -91,18 +91,18 @@ source venv/bin/activate
 python -m scripts.reconmancer_selfcheck
 ```
 
-Reconmancer binds to `127.0.0.1:8000` and is not intended to be exposed directly to the public Internet.
+Reconmancer binds to `127.0.0.1:9090` and is not intended to be exposed directly to the public Internet.
 
 For a remote VPS, a typical local SSH tunnel is:
 
 ```bash
-ssh -L 8000:127.0.0.1:8000 USER@YOUR_VPS_IP
+ssh -L 9090:127.0.0.1:9090 USER@YOUR_VPS_IP
 ```
 
 Then open:
 
 ```text
-http://127.0.0.1:8000
+http://127.0.0.1:9090
 ```
 
 ## First project
